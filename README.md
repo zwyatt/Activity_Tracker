@@ -1,4 +1,4 @@
-# Activity_Tracker 0.1
+# Activity_Tracker 0.11
 Aardwolf MUSHCLIENT plugin to track group activity
 ```
 acti help
