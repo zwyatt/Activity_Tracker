@@ -37,3 +37,6 @@ acti test <on/off> -> toggle displaying test messages (very spammy)
 - Rounds/target metric?
 - Timestamp damage taken for death summary reports? Time to return after death?
 - Damage tracking, I guess? Low priority
+
+### Updates:
+0.11 - Fixed spellchant pretitle capture and Genie 'blizzard of sand' attack capture
