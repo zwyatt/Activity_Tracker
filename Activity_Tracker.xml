@@ -14,7 +14,7 @@
    purpose="Track group activity in epics"
    date_written="2026-09-30 12:00:50"
    requires="5.07"
-   version="0.11"
+   version="0.12"
 />
 
 <!--  Timers  -->
@@ -607,7 +607,9 @@ function update_group()
          if players[name].qs < 2 and qs == 2 then
             players[name]:quest()
             if looping then current_loop[name]:quest() end
-            CallPlugin(commlog_id, "storeFromOutside", "ACTINFO: " .. name .. " finished quest at " .. os.date("%I:%M:%S"))
+            local notice = "ACTINFO: " .. name .. " finished quest at " .. os.date("%I:%M:%S")
+            CallPlugin(commlog_id, "storeFromOutside", notice)
+            print(notice)
          end
 
          players[name].qs = qs
