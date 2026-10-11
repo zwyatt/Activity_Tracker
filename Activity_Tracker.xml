@@ -14,7 +14,7 @@
    purpose="Track group activity in epics"
    date_written="2026-09-30 12:00:50"
    requires="5.07"
-   version="0.1"
+   version="0.11"
 />
 
 <!--  Timers  -->
@@ -55,7 +55,7 @@
    <trigger
       name="spellchant_capture"
       enabled="n"
-      match="^(?<caster>.*) chants the phrase '(?<spell>(party heal|dampening field|dispel magic|regeneration|incomplete healing|heal|restore life|healing touch|renew|sacrifice life|natures touch|reverse align|hex of misfortune|tortured vision|hex of entropy|curse of sloth|raw flesh|disease|demoralize|slow|zombify|suppressed healing|web|petrify|soften|poison|curse|weaken|rune of ix|blindness|psychic drain|rune of ix|chill touch))'\.$"
+      match="^(?:(?<pretitle>.*) )?(?<caster>\w*) chants the phrase '(?<spell>(party heal|dampening field|dispel magic|regeneration|incomplete healing|heal|restore life|healing touch|renew|sacrifice life|natures touch|reverse align|hex of misfortune|tortured vision|hex of entropy|curse of sloth|raw flesh|disease|demoralize|slow|zombify|suppressed healing|web|petrify|soften|poison|curse|weaken|rune of ix|blindness|psychic drain|rune of ix|chill touch))'\.$"
       regexp="y"
       omit_from_output="n"
       sequence="100"
@@ -64,7 +64,7 @@
    <trigger
       name="nonfiltered_spellchant_capture"
       enabled="y"
-      match="^(?<caster>.*) chants the phrase '(?<spell>.*)'\.$"
+      match="^(?:(?<pretitle>.*) )?(?<caster>\w*) chants the phrase '(?<spell>.*)'\.$"
       regexp="y"
       omit_from_output="n"
       sequence="101"
@@ -361,6 +361,17 @@ function is_self(name)
 end -- is_self --
 
 
+function pretitle_output(pretitle)
+   local output = ""
+
+   if pretitle then
+      output = "(" .. pretitle .. ") "
+   end
+
+   return output
+end -- pretitle_output --
+
+
 function help()
    print("Activity Tracker help")
    print("------------------------------------------------------------------------------")
@@ -493,7 +504,7 @@ end -- Attack --
 function attack_capture(name, line, args)
    local attacker = is_self(args.attacker)
    local target = is_self(args.target)
-   args.pretitle = args.pretitle or ""
+   local pretitle = pretitle_output(args.pretitle)
    local atk = Attack:new(attacker, args.attack, target, args.crit, args.hits, args.damage)
 
    if players[attacker] ~= nil then
@@ -504,13 +515,14 @@ function attack_capture(name, line, args)
       current_loop[attacker]:attack(atk)
    end
 
-   test_print(args.pretitle .. " " .. attacker .. " | " .. args.attack .. " | " .. target)
+   test_print(pretitle .. attacker .. " | " .. args.attack .. " | " .. target)
 end -- attack_capture --
 
 
 function spellchant_capture(name, line, args)
    local caster = is_self(args.caster)
-   test_print("FILTERED: " .. caster .. " cast " .. args.spell)
+   local pretitle = pretitle_output(args.pretitle)
+   test_print("FILTERED: " .. pretitle .. caster .. " cast " .. args.spell)
 
    if players[caster] ~= nil then
       players[caster]:cast(args.spell)
@@ -524,7 +536,8 @@ end -- spellchant_capture --
 
 function nonfiltered_spellchant_capture(name, line, args)
    local caster = is_self(args.caster)
-   test_print("NONFILTERED: " .. caster .. " cast " .. args.spell)
+   local pretitle = pretitle_output(args.pretitle)
+   test_print("NONFILTERED: " .. pretitle .. caster .. " cast " .. args.spell)
 
    if players[caster] ~= nil then
       players[caster]:cast(args.spell)
@@ -687,9 +700,9 @@ function loops_report()
          for name, player in pairs(loop) do
             if loops_total[name] ~= nil then
                loops_total[name].total_attacks = loops_total[name].total_attacks + player.total_attacks
-               local total_satks = loops_total[name].attacks["a blizzard of sand"] or 0
-               local loop_satks = player.attacks["a blizzard of sand"] or 0
-               loops_total[name].attacks["a blizzard of sand"] = total_satks + loop_satks
+               local total_satks = loops_total[name].attacks["blizzard of sand"] or 0
+               local loop_satks = player.attacks["blizzard of sand"] or 0
+               loops_total[name].attacks["blizzard of sand"] = total_satks + loop_satks
                loops_total[name].rescues = loops_total[name].rescues + player.rescues
                loops_total[name].deaths = loops_total[name].deaths + player.deaths
             else
@@ -708,13 +721,13 @@ function loop_report(loop)
    local i_loop = table.i_copy(loop)
    table.sort(i_loop,
       function(p1, p2)
-         local p1_satks = p1.attacks["a blizzard of sand"] or 0
-         local p2_satks = p2.attacks["a blizzard of sand"] or 0
+         local p1_satks = p1.attacks["blizzard of sand"] or 0
+         local p2_satks = p2.attacks["blizzard of sand"] or 0
          return p1_satks > p2_satks
       end
       )
    for _, player in ipairs(i_loop) do
-      local satks = player.attacks["a blizzard of sand"] or 0
+      local satks = player.attacks["blizzard of sand"] or 0
       local output = player:to_string()
       output = string.gsub(output, "->", "-> Satk: " .. satks .. " |")
       print(output)
@@ -732,7 +745,8 @@ data_options = {
    [2] = "Casts",
    [3] = "Rescues",
    [4] = "Quaffs",
-   [5] = "Quests"
+   [5] = "Deaths",
+   [6] = "Quests"
 }
 
 data_options_length = 5
@@ -907,6 +921,9 @@ function window_draw()
          table.sort(sorted_players, function(p1, p2) return p1.quaffs > p2.quaffs end)
          return function(player) return player.quaffs end
       elseif data_option == 5 then
+         table.sort(sorted_players, function(p1, p2) return p1.deaths > p2.deaths end)
+         return function(player) return player.deaths end  
+      elseif data_option == 6 then
          table.sort(sorted_players, function(p1, p2) return p1.quests > p2.quests end)
          return function(player) return player.quests end
       end
@@ -954,6 +971,7 @@ function right_click_menu()
    menustring = menustring .. "Casts|"
    menustring = menustring .. "Rescues|"
    menustring = menustring .. "Quaffs|"
+   menustring = menustring .. "Deaths|"
    menustring = menustring .. "Quests|-|"
    menustring = menustring .. "Font|"
    menustring = menustring .. "Base Colour|-|"
@@ -984,8 +1002,10 @@ function right_click_menu()
       data_option = 3
    elseif result == "Quaffs" then
       data_option = 4
-   elseif result == "Quests" then
+   elseif result == "Deaths" then
       data_option = 5
+   elseif result == "Quests" then
+      data_option = 6
 
    elseif result == "Font" then
       local wanted_font = utils.fontpicker(font_name, font_size) -- font dialog
