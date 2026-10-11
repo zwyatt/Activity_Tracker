@@ -1,4 +1,4 @@
-# Activity_Tracker 0.11
+# Activity_Tracker 0.12
 Aardwolf MUSHCLIENT plugin to track group activity
 ```
 acti help
@@ -39,4 +39,5 @@ acti test <on/off> -> toggle displaying test messages (very spammy)
 - Damage tracking, I guess? Low priority
 
 ### Updates:
+0.12 - Quest now also reports to mud output
 0.11 - Fixed spellchant pretitle capture and Genie 'blizzard of sand' attack capture
