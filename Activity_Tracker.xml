@@ -13,8 +13,9 @@
    language="Lua"
    purpose="Track group activity in epics"
    date_written="2026-09-30 12:00:50"
+   save_state="y"
    requires="5.07"
-   version="0.12"
+   version="0.13"
 />
 
 <!--  Timers  -->
@@ -38,7 +39,9 @@
    <alias match="^acti reset$" regexp="y" enabled="y" sequence="100" script="reset" />
    <alias match="^acti win (?<cmd>(on|off))$" regexp="y" enabled="y" sequence="100" script="window_show" />
    <alias match="^acti remove (?<member>.+)$" regexp="y" enabled="y" sequence="100" script="remove_member" />
-   <alias match="^acti test (?<cmd>(on|off))$" regexp="y" enabled="y" sequence="100" script="set_test_mode" />
+   <alias match="^acti spellchants$" regexp="y" enabled="y" sequence="100" script="toggle_gag_spellchants" />
+   <alias match="^acti groupcombat$" regexp="y" enabled="y" sequence="100" script="toggle_gag_groupcombat" />
+   <alias match="^acti test$" regexp="y" enabled="y" sequence="100" script="toggle_test_mode" />
    <alias match="^acti next$" regexp="y" enabled="y" sequence="100" script="next_data" />
    <alias match="^acti prev$" regexp="y" enabled="y" sequence="100" script="prev_data" />
    <alias match="^acti loop new$" regexp="y" enabled="y" sequence="100" script="loop_new" />
@@ -57,7 +60,7 @@
       enabled="n"
       match="^(?:(?<pretitle>.*) )?(?<caster>\w*) chants the phrase '(?<spell>(party heal|dampening field|dispel magic|regeneration|incomplete healing|heal|restore life|healing touch|renew|sacrifice life|natures touch|reverse align|hex of misfortune|tortured vision|hex of entropy|curse of sloth|raw flesh|disease|demoralize|slow|zombify|suppressed healing|web|petrify|soften|poison|curse|weaken|rune of ix|blindness|psychic drain|rune of ix|chill touch))'\.$"
       regexp="y"
-      omit_from_output="n"
+      omit_from_output="y"
       sequence="100"
       script="spellchant_capture"
    />
@@ -66,7 +69,7 @@
       enabled="y"
       match="^(?:(?<pretitle>.*) )?(?<caster>\w*) chants the phrase '(?<spell>.*)'\.$"
       regexp="y"
-      omit_from_output="n"
+      omit_from_output="y"
       sequence="101"
       script="nonfiltered_spellchant_capture"
    />
@@ -98,18 +101,27 @@
       script="attack_capture"    
    />
    <trigger
-      name="attack_capture"
+      name="self_attacked_capture"
       enabled="y"   
-      match="^(?<crit>\*)?(?:\[(?<hits>\d+)\] )?(?:(?<pretitle>.*))? (?<attacker>\w*)'s? (?<attack>.*) (?:decimates|devastates|rends|incinerates|lacerates|obliterates|massacres|disembowels|extirpates|eradicates|dismembers|mutilates|tickles|bruises|scratches|grazes|nicks|scars|hits|injures|wounds|mauls|maims|mangles|mars|LACERATES|DECIMATES|DEVASTATES|ERADICATES|OBLITERATES|EXTIRPATES|INCINERATES|MUTILATES|DISEMBOWELS|MASSACRES|DISMEMBERS|RENDS|blasts|demolishes|shreds|destroys|pulverizes|vaporizes|atomizes|asphyxiates|ravages|fissures|liquidates|evaporates|sunders|tears into|wastes|cremates|annihilates|implodes|exterminates|shatters|slaughters|ruptures|nukes|glaciates|meteorites|supernovas|damages|- BLASTS -|-= DEMOLISHES =-|\*\* SHREDS \*\*|\*\*\*\* DESTROYS \*\*\*\*|\*\*\*\*\* PULVERIZES \*\*\*\*\*|-=- VAPORIZES -=-|\<-==-\> ATOMIZES \<-==-\>|\<-:-\> ASPHYXIATES \<-:-\>|\<-\*-\> RAVAGES \<-\*-\>|\<\>\*\<\> FISSURES \<\>\*\<\>|\<\*\>\<\*\> LIQUIDATES \<\*\>\<\*\>|\<\*\>\<\*\>\<\*\> EVAPORATES \<\*\>\<\*\>\<\*\>|\<-=-\> SUNDERS \<-=-\>|\<=-=\>\<=-=\> TEARS INTO \<=-=\>\<=-=\>|\<-\>\*\<=\> WASTES \<=\>\*\<-\>|\<-\+-\>\<-\*-\> CREMATES \<-\*-\>\<-\+-\>|\<\*\>\<\*\>\<\*\>\<\*\> ANNIHILATES \<\*\>\<\*\>\<\*\>\<\*\>|\<--\*--\>\<--\*--\> IMPLODES \<--\*--\>\<--\*--\>|\<-\>\<-=-\>\<-\> EXTERMINATES \<-\>\<-=-\>\<-\>|\<-==-\>\<-==-\> SHATTERS \<-==-\>\<-==-\>|\<\*\>\<-:-\>\<\*\> SLAUGHTERS \<\*\>\<-:-\>\<\*\>|\<-\*-\>\<-\>\<-\*-\> RUPTURES \<-\*-\>\<-\>\<-\*-\>|\<-\*-\>\<\*\>\<-\*-\> NUKES \<-\*-\>\<\*\>\<-\*-\>|-\<\[=-\+-=\]\<:::\<\>:::\> GLACIATES \<:::\<\>:::\>\[=-\+-=\]\>-|\<-=-\>\<-:-\*-:-\>\<\*--\*\> METEORITES \<\*--\*\>\<-:-\*-:-\>\<-=-\>|\<-:-\>\<-:-\*-:-\>\<-\*-\> SUPERNOVAS \<-\*-\>\<-:-\*-:-\>\<-:-\>|does UNSPEAKABLE things to|does UNTHINKABLE things to|does UNIMAGINABLE things to|does UNBELIEVABLE things to) (?<target>.*). \[(?<damage>\d+)\]\*?$"
+      match="^(?<crit>\*)?(?:\[(?<hits>\d+)\] )?(?<attacker>.*)'s? (?<attack>.*) (?:decimates|devastates|rends|incinerates|lacerates|obliterates|massacres|disembowels|extirpates|eradicates|dismembers|mutilates|tickles|bruises|scratches|grazes|nicks|scars|hits|injures|wounds|mauls|maims|mangles|mars|LACERATES|DECIMATES|DEVASTATES|ERADICATES|OBLITERATES|EXTIRPATES|INCINERATES|MUTILATES|DISEMBOWELS|MASSACRES|DISMEMBERS|RENDS|blasts|demolishes|shreds|destroys|pulverizes|vaporizes|atomizes|asphyxiates|ravages|fissures|liquidates|evaporates|sunders|tears into|wastes|cremates|annihilates|implodes|exterminates|shatters|slaughters|ruptures|nukes|glaciates|meteorites|supernovas|damages|- BLASTS -|-= DEMOLISHES =-|\*\* SHREDS \*\*|\*\*\*\* DESTROYS \*\*\*\*|\*\*\*\*\* PULVERIZES \*\*\*\*\*|-=- VAPORIZES -=-|\<-==-\> ATOMIZES \<-==-\>|\<-:-\> ASPHYXIATES \<-:-\>|\<-\*-\> RAVAGES \<-\*-\>|\<\>\*\<\> FISSURES \<\>\*\<\>|\<\*\>\<\*\> LIQUIDATES \<\*\>\<\*\>|\<\*\>\<\*\>\<\*\> EVAPORATES \<\*\>\<\*\>\<\*\>|\<-=-\> SUNDERS \<-=-\>|\<=-=\>\<=-=\> TEARS INTO \<=-=\>\<=-=\>|\<-\>\*\<=\> WASTES \<=\>\*\<-\>|\<-\+-\>\<-\*-\> CREMATES \<-\*-\>\<-\+-\>|\<\*\>\<\*\>\<\*\>\<\*\> ANNIHILATES \<\*\>\<\*\>\<\*\>\<\*\>|\<--\*--\>\<--\*--\> IMPLODES \<--\*--\>\<--\*--\>|\<-\>\<-=-\>\<-\> EXTERMINATES \<-\>\<-=-\>\<-\>|\<-==-\>\<-==-\> SHATTERS \<-==-\>\<-==-\>|\<\*\>\<-:-\>\<\*\> SLAUGHTERS \<\*\>\<-:-\>\<\*\>|\<-\*-\>\<-\>\<-\*-\> RUPTURES \<-\*-\>\<-\>\<-\*-\>|\<-\*-\>\<\*\>\<-\*-\> NUKES \<-\*-\>\<\*\>\<-\*-\>|-\<\[=-\+-=\]\<:::\<\>:::\> GLACIATES \<:::\<\>:::\>\[=-\+-=\]\>-|\<-=-\>\<-:-\*-:-\>\<\*--\*\> METEORITES \<\*--\*\>\<-:-\*-:-\>\<-=-\>|\<-:-\>\<-:-\*-:-\>\<-\*-\> SUPERNOVAS \<-\*-\>\<-:-\*-:-\>\<-:-\>|does UNSPEAKABLE things to|does UNTHINKABLE things to|does UNIMAGINABLE things to|does UNBELIEVABLE things to) (?<target>you). \[(?<damage>\d+)\]\*?$"
       regexp="y"
       omit_from_output="n"
       sequence="101"
       script="attack_capture"
    />
    <trigger
+      name="attack_capture"
+      enabled="y"   
+      match="^(?<crit>\*)?(?:\[(?<hits>\d+)\] )?(?:(?<pretitle>.*) )?(?<attacker>\w*)'s? (?<attack>.*) (?:decimates|devastates|rends|incinerates|lacerates|obliterates|massacres|disembowels|extirpates|eradicates|dismembers|mutilates|tickles|bruises|scratches|grazes|nicks|scars|hits|injures|wounds|mauls|maims|mangles|mars|LACERATES|DECIMATES|DEVASTATES|ERADICATES|OBLITERATES|EXTIRPATES|INCINERATES|MUTILATES|DISEMBOWELS|MASSACRES|DISMEMBERS|RENDS|blasts|demolishes|shreds|destroys|pulverizes|vaporizes|atomizes|asphyxiates|ravages|fissures|liquidates|evaporates|sunders|tears into|wastes|cremates|annihilates|implodes|exterminates|shatters|slaughters|ruptures|nukes|glaciates|meteorites|supernovas|damages|- BLASTS -|-= DEMOLISHES =-|\*\* SHREDS \*\*|\*\*\*\* DESTROYS \*\*\*\*|\*\*\*\*\* PULVERIZES \*\*\*\*\*|-=- VAPORIZES -=-|\<-==-\> ATOMIZES \<-==-\>|\<-:-\> ASPHYXIATES \<-:-\>|\<-\*-\> RAVAGES \<-\*-\>|\<\>\*\<\> FISSURES \<\>\*\<\>|\<\*\>\<\*\> LIQUIDATES \<\*\>\<\*\>|\<\*\>\<\*\>\<\*\> EVAPORATES \<\*\>\<\*\>\<\*\>|\<-=-\> SUNDERS \<-=-\>|\<=-=\>\<=-=\> TEARS INTO \<=-=\>\<=-=\>|\<-\>\*\<=\> WASTES \<=\>\*\<-\>|\<-\+-\>\<-\*-\> CREMATES \<-\*-\>\<-\+-\>|\<\*\>\<\*\>\<\*\>\<\*\> ANNIHILATES \<\*\>\<\*\>\<\*\>\<\*\>|\<--\*--\>\<--\*--\> IMPLODES \<--\*--\>\<--\*--\>|\<-\>\<-=-\>\<-\> EXTERMINATES \<-\>\<-=-\>\<-\>|\<-==-\>\<-==-\> SHATTERS \<-==-\>\<-==-\>|\<\*\>\<-:-\>\<\*\> SLAUGHTERS \<\*\>\<-:-\>\<\*\>|\<-\*-\>\<-\>\<-\*-\> RUPTURES \<-\*-\>\<-\>\<-\*-\>|\<-\*-\>\<\*\>\<-\*-\> NUKES \<-\*-\>\<\*\>\<-\*-\>|-\<\[=-\+-=\]\<:::\<\>:::\> GLACIATES \<:::\<\>:::\>\[=-\+-=\]\>-|\<-=-\>\<-:-\*-:-\>\<\*--\*\> METEORITES \<\*--\*\>\<-:-\*-:-\>\<-=-\>|\<-:-\>\<-:-\*-:-\>\<-\*-\> SUPERNOVAS \<-\*-\>\<-:-\*-:-\>\<-:-\>|does UNSPEAKABLE things to|does UNTHINKABLE things to|does UNIMAGINABLE things to|does UNBELIEVABLE things to) (?<target>.*). \[(?<damage>\d+)\]\*?$"
+      regexp="y"
+      omit_from_output="y"
+      sequence="102"
+      script="attack_capture"
+   />
+   <trigger
       name="hook_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: The pirates prepare a burial at sea for (?<name>.+), slain by (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -120,7 +132,7 @@
    <trigger
       name="retribution_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: (?<name>.+) is sent with a blood curdling scream by (?<mob>.+) to meet Taboo.$"
       regexp="y"
       omit_from_output="n"
@@ -131,7 +143,7 @@
    <trigger
       name="light_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: Radience embraces (?<name>.+) who died valiantly in combat against (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -142,7 +154,7 @@
    <trigger
       name="emerald_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: Knights race from the stronghold to avenge the death of (?<name>.+) to (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -153,7 +165,7 @@
    <trigger
       name="touchstone_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: A mountain fades as (?<name>.+) dies to (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -164,7 +176,7 @@
    <trigger
       name="boot_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: (?<name>.+) has failed the exam administered by (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -175,7 +187,7 @@
    <trigger
       name="baal_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: (?<name>.+), cursing (?<mob>.+), embraces death and returns to the Dark One.$"
       regexp="y"
       omit_from_output="n"
@@ -186,7 +198,7 @@
    <trigger
       name="amazon_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: The Tribes prepare a ritual for (?<name>.+). Hunters are sent after (?<mob>.+) for revenge.$"
       regexp="y"
       omit_from_output="n"
@@ -197,7 +209,7 @@
    <trigger
       name="amazon_capture2"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: The Amazon Warriors fight even stronger after (?<name>.+) is killed by (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -208,7 +220,7 @@
    <trigger
       name="watchmen_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: (?<name>.+) has fallen, blood staining (?<mob>.+)('s|') hands.$"
       regexp="y"
       omit_from_output="n"
@@ -219,8 +231,8 @@
    <trigger
       name="seekers_capture"
       group="capture"
-      enabled="n"
-      match="^INFO: (?<name>.+)('s|') knowledge couldn't save them from (?<mob>.+).$"
+      enabled="y"
+      match="^INFO: (?<name>.+)'s? knowledge couldn't save them from (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
       sequence="100"
@@ -230,7 +242,7 @@
    <trigger
       name="lone_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: (?<name>.+) has been killed by (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -241,7 +253,7 @@
    <trigger
       name="lone_capture2"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: (?<name>.+) has been removed from this realm by (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -252,7 +264,7 @@
    <trigger
       name="lone_capture3"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: The valkyries come for (?<name>.+) who was slain by (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -263,7 +275,7 @@
    <trigger
       name="twinlobe_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: (?<name>.+) has attained a better understanding of death, thanks to (?<mob>.+)!$"
       regexp="y"
       omit_from_output="n"
@@ -274,7 +286,7 @@
    <trigger
       name="crimson_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: (?<name>.+)('s|') blood is spilled by (?<mob>.+) and the earth runs crimson.$"
       regexp="y"
       omit_from_output="n"
@@ -285,7 +297,7 @@
    <trigger
       name="perdition_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: Valiant to the end, (?<name>.+) has fallen to (?<mob>.+) in battle.$"
       regexp="y"
       omit_from_output="n"
@@ -296,7 +308,7 @@
    <trigger
       name="loqui_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: Silence falls as (?<name>.+) is slain by (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -307,7 +319,7 @@
    <trigger
       name="pyre_capture"
       group="capture"
-      enabled="n"
+      enabled="y"
       match="^INFO: Tormented spirits wail in requiem as dark flames ravage the soul of (?<name>.+), slain by (?<mob>.+).$"
       regexp="y"
       omit_from_output="n"
@@ -380,6 +392,7 @@ function help()
    print("acti reset -> reset data")
    print("acti remove <member> -> remove member from data, if they have left the group (case sensitive)")
    print("acti next/prev -> scroll through window data options (or use right-click menu)")
+   print("acti <spellchants/groupcombat> -> toggle gagging spellchants/groupcombat")
    print("------------------------------------------------------------------------------")
    print("acti loop new -> begin recording a new loop, ends and saves one if in progress")
    print("acti loop end -> ends recording and saves the current loop without starting a new one")
@@ -387,13 +400,42 @@ function help()
    print("acti loop reset -> ends recording and deletes all loop data")
    print("acti loop report -> reports total saved loop performance to this point")
    print("------------------------------------------------------------------------------")
-   print("acti test <on/off> -> toggle displaying test messages (very spammy)")
+   print("acti test -> toggle displaying test messages (very spammy)")
 end -- help --
 
 
-function set_test_mode(name, line, args)
-   test_mode = args.cmd == "on"
-   print("ACTI test mode is now " .. args.cmd)
+function toggle_gag_spellchants()
+   local gag = "y"
+   local output = "now gagged"
+   gag_spellchants = not gag_spellchants
+   if not gag_spellchants then
+      gag = "n"
+      output = "no longer gagged"
+   end
+   SetTriggerOption("nonfiltered_spellchant_capture", "omit_from_output", gag)
+   SetVariable("gag_spellchants", tostring(gag_groupcombat))
+   print("ACTINFO: " .. "spellchants are " .. output)
+end -- set_gag_mode --
+
+
+function toggle_gag_groupcombat()
+   local gag = "y"
+   local output = "now gagged"
+   gag_groupcombat = not gag_groupcombat
+   if not gag_groupcombat then
+      gag = "n"
+      output = "no longer gagged"
+   end
+   SetTriggerOption("attack_capture", "omit_from_output", gag)
+   SetVariable("gag_groupcombat", tostring(gag_groupcombat))
+   print("ACTINFO: " .. "spellchants are " .. output)
+end -- set_gag_mode --
+
+
+function toggle_test_mode()
+   test_mode = not test_mode
+   SetVariable("test_mode", tostring(test_mode))
+   print("ACTINFO: test mode is now " .. tostring(test_mode))
 end -- set_test_mode --
 
 
@@ -582,6 +624,10 @@ function death_capture(name, line, args)
    if players[args.name] ~= nil then
       players[args.name]:die(args.mob)
    end
+
+   if is_looping(args.name) then
+      current_loop[args.name]:die(args.mob)
+   end
    test_print(args.name .. " died to " .. args.mob)
 end -- death_capture --
 
@@ -629,7 +675,7 @@ end -- remove_member --
 function reset()
    players = {}
    update_group()
-   print("Resetting activity tracker data")
+   print("ACTINFO: Resetting activity tracker data")
 end -- reset --
 
 
@@ -655,12 +701,13 @@ end
 function loop_new()
    if looping and not is_empty(current_loop) then
       table.insert(loops, current_loop)
+      print("ACTINFO: Reporting for loop " .. #loops)
       loop_report(current_loop)
    end
    looping = true
    current_loop = {}
    update_group()
-   print("ACTI: Recording loop " .. #loops + 1)
+   print("ACTINFO: Recording loop " .. #loops + 1)
 end -- loop_new --
 
 
@@ -668,18 +715,19 @@ end -- loop_new --
 function loop_end()
    if looping and not is_empty(current_loop) then
       table.insert(loops, current_loop)
+      print("ACTINFO: Reporting for loop " .. #loops)
       loop_report(current_loop)
    end
    looping = false
    current_loop = {}
-   print("ACTI: Ending current loop")
+   print("ACTINFO: Ending loop " .. #loops)
 end -- loop_end --
 
 
 -- [[ Stop recording and delete the current loop ]] --
 function loop_discard()
    looping = false
-   print("ACTI: Discarding loop " .. #loops + 1)
+   print("ACTINFO: Discarding loop " .. #loops + 1)
    loop_end()
 end -- loop_discard --
 
@@ -689,13 +737,14 @@ function loop_reset()
    loops = {}
    current_loop = {}
    looping = false
-   print("ACTI: Resetting loops")
+   print("ACTINFO: Resetting loops")
 end -- loop_reset --
 
 
 -- [[ Report each player's TOTAL loop performance ]] --
 function loops_report()
    local loops_total = {}
+   print("ACTINFO: Reporting for " .. #loops .. " loops")
 
    if not is_empty(loops) then
       for _, loop in ipairs(loops) do
@@ -743,7 +792,7 @@ data_option = 0
 
 data_options = {
    [0] = "Attacks",
-   [1] = "Healing",
+   [1] = "Party Heals",
    [2] = "Casts",
    [3] = "Rescues",
    [4] = "Quaffs",
@@ -751,7 +800,7 @@ data_options = {
    [6] = "Quests"
 }
 
-data_options_length = 5
+data_options_length = 6
 
 
 function next_data()
@@ -911,8 +960,13 @@ function window_draw()
          table.sort(sorted_players, function(p1, p2) return p1.total_attacks > p2.total_attacks end)
          return function(player) return player.total_attacks end
       elseif data_option == 1 then
-         table.sort(sorted_players, function(p1, p2) return p1.total_healing > p2.total_healing end)
-         return function(player) return player.total_healing end
+         table.sort(sorted_players,
+            function(p1, p2)
+               local p1_pheals = p1.casts["party heal"] or 0
+               local p2_pheals = p2.casts["party heal"] or 0
+               return p1_pheals > p2_pheals
+            end)
+         return function(player) return player.casts["party heal"] or 0 end
       elseif data_option == 2 then
          table.sort(sorted_players, function(p1, p2) return p1.total_casts > p2.total_casts end)
          return function(player) return player.total_casts end
@@ -969,7 +1023,7 @@ function right_click_menu()
    -- [[ Generate menustring ]] --
    local menustring = ""
    menustring = "Attacks|"
-   menustring = menustring .. "Healing|"
+   menustring = menustring .. "Party Heals|"
    menustring = menustring .. "Casts|"
    menustring = menustring .. "Rescues|"
    menustring = menustring .. "Quaffs|"
@@ -996,7 +1050,7 @@ function right_click_menu()
 
    if result == "Attacks" then
       data_option = 0
-   elseif result == "Healing" then
+   elseif result == "Party Heals" then
       data_option = 1
    elseif result == "Casts" then
       data_option = 2
@@ -1173,9 +1227,13 @@ function OnPluginInstall()
    loops = {}
    current_loop = {}
    looping = false
-   test_mode = false
+   test_mode = GetVariable("test_mode") == "true"
+   gag_spellchants = GetVariable("gag_spellchants") or true
+   gag_spellchants = tostring(gag_spellchants) == "true"
+   gag_groupcombat = GetVariable("gag_groupcombat") or true
+   gag_groupcombat = tostring(gag_groupcombat) == "true"
    self_name = gmcp("char.base.name")
-  window_install()
+   window_install()
 end -- OnPluginInstall --
 
 
@@ -1186,7 +1244,10 @@ end -- OnPluginConnect --
 
 
 function OnPluginSaveState()
-  window_save()
+   SetVariable("test_mode", tostring(test_mode))
+   SetVariable("gag_spellchants", tostring(gag_spellchants))
+   SetVariable("gag_groupcombat", tostring(gag_groupcombat))
+   window_save()
 end -- OnPluginSaveState --
 
 
