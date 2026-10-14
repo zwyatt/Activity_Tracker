@@ -15,7 +15,7 @@
    date_written="2026-09-30 12:00:50"
    save_state="y"
    requires="5.07"
-   version="0.13"
+   version="0.14"
 />
 
 <!--  Timers  -->
@@ -63,7 +63,14 @@
       omit_from_output="y"
       sequence="100"
       script="spellchant_capture"
-   />
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", true)
+         EnableTrigger("full", true)
+      </send>
+   </trigger>
+
    <trigger
       name="nonfiltered_spellchant_capture"
       enabled="y"
@@ -72,7 +79,13 @@
       omit_from_output="y"
       sequence="101"
       script="nonfiltered_spellchant_capture"
-   />
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", true)
+         EnableTrigger("full", true)
+      </send>
+   </trigger>
    <trigger
       name="quaff_capture"
       enabled="y"
@@ -81,7 +94,13 @@
       omit_from_output="n"
       sequence="100"
       script="quaff_capture"
-   />
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="rescue_capture"
       enabled="y"
@@ -90,7 +109,13 @@
       omit_from_output="n"
       sequence="100"
       script="rescue_capture"
-   />
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="self_attack_capture"
       enabled="y"   
@@ -99,7 +124,13 @@
       omit_from_output="n"
       sequence="100"
       script="attack_capture"    
-   />
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="self_attacked_capture"
       enabled="y"   
@@ -108,19 +139,91 @@
       omit_from_output="n"
       sequence="101"
       script="attack_capture"
-   />
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="attack_capture"
-      enabled="y"   
+      group="groupcombat"
+      enabled="y"
       match="^(?<crit>\*)?(?:\[(?<hits>\d+)\] )?(?:(?<pretitle>.*) )?(?<attacker>\w*)'s? (?<attack>.*) (?:decimates|devastates|rends|incinerates|lacerates|obliterates|massacres|disembowels|extirpates|eradicates|dismembers|mutilates|tickles|bruises|scratches|grazes|nicks|scars|hits|injures|wounds|mauls|maims|mangles|mars|LACERATES|DECIMATES|DEVASTATES|ERADICATES|OBLITERATES|EXTIRPATES|INCINERATES|MUTILATES|DISEMBOWELS|MASSACRES|DISMEMBERS|RENDS|blasts|demolishes|shreds|destroys|pulverizes|vaporizes|atomizes|asphyxiates|ravages|fissures|liquidates|evaporates|sunders|tears into|wastes|cremates|annihilates|implodes|exterminates|shatters|slaughters|ruptures|nukes|glaciates|meteorites|supernovas|damages|- BLASTS -|-= DEMOLISHES =-|\*\* SHREDS \*\*|\*\*\*\* DESTROYS \*\*\*\*|\*\*\*\*\* PULVERIZES \*\*\*\*\*|-=- VAPORIZES -=-|\<-==-\> ATOMIZES \<-==-\>|\<-:-\> ASPHYXIATES \<-:-\>|\<-\*-\> RAVAGES \<-\*-\>|\<\>\*\<\> FISSURES \<\>\*\<\>|\<\*\>\<\*\> LIQUIDATES \<\*\>\<\*\>|\<\*\>\<\*\>\<\*\> EVAPORATES \<\*\>\<\*\>\<\*\>|\<-=-\> SUNDERS \<-=-\>|\<=-=\>\<=-=\> TEARS INTO \<=-=\>\<=-=\>|\<-\>\*\<=\> WASTES \<=\>\*\<-\>|\<-\+-\>\<-\*-\> CREMATES \<-\*-\>\<-\+-\>|\<\*\>\<\*\>\<\*\>\<\*\> ANNIHILATES \<\*\>\<\*\>\<\*\>\<\*\>|\<--\*--\>\<--\*--\> IMPLODES \<--\*--\>\<--\*--\>|\<-\>\<-=-\>\<-\> EXTERMINATES \<-\>\<-=-\>\<-\>|\<-==-\>\<-==-\> SHATTERS \<-==-\>\<-==-\>|\<\*\>\<-:-\>\<\*\> SLAUGHTERS \<\*\>\<-:-\>\<\*\>|\<-\*-\>\<-\>\<-\*-\> RUPTURES \<-\*-\>\<-\>\<-\*-\>|\<-\*-\>\<\*\>\<-\*-\> NUKES \<-\*-\>\<\*\>\<-\*-\>|-\<\[=-\+-=\]\<:::\<\>:::\> GLACIATES \<:::\<\>:::\>\[=-\+-=\]\>-|\<-=-\>\<-:-\*-:-\>\<\*--\*\> METEORITES \<\*--\*\>\<-:-\*-:-\>\<-=-\>|\<-:-\>\<-:-\*-:-\>\<-\*-\> SUPERNOVAS \<-\*-\>\<-:-\*-:-\>\<-:-\>|does UNSPEAKABLE things to|does UNTHINKABLE things to|does UNIMAGINABLE things to|does UNBELIEVABLE things to) (?<target>.*). \[(?<damage>\d+)\]\*?$"
       regexp="y"
       omit_from_output="y"
       sequence="102"
       script="attack_capture"
-   />
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
+   <trigger
+      name="blank"
+      group="pacman"
+      enabled="y"
+      match="^$"
+      regexp="y"
+      omit_from_output="y"
+      sequence="100"
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
+   <trigger
+      name="full"
+      group="pacman"
+      enabled="n"
+      match="^.*$"
+      regexp="y"
+      omit_from_output="n"
+      sequence="103"
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
+   <trigger
+      name="miss_capture"
+      group="groupcombat"
+      enabled="y"
+      match="^(?<crit>\*)?(?:\[(?<hits>\d+)\] )?(?:(?<pretitle>.*) )?(?<attacker>\w*)'s? (?<attack>.*) misses (?!you)(?<target>.*). \[0\]"
+      regexp="y"
+      omit_from_output="y"
+      sequence="100"
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
+   <trigger
+      name="immune_capture"
+      group="groupcombat"
+      enabled="y"
+      match="^(?<crit>\*)?(?:\[(?<hits>\d+)\] )?(?:(?<tar_pretitle>.*) )?(?<target>\w*) is unaffected by (?:(?<atk_pretitle>.*) )?(?<attacker>.*)'s? (?<attack>.*).$"
+      regexp="y"
+      omit_from_output="y"
+      sequence="100"
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="hook_capture"
-      group="capture"
       enabled="y"
       match="^INFO: The pirates prepare a burial at sea for (?<name>.+), slain by (?<mob>.+).$"
       regexp="y"
@@ -128,10 +231,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="retribution_capture"
-      group="capture"
       enabled="y"
       match="^INFO: (?<name>.+) is sent with a blood curdling scream by (?<mob>.+) to meet Taboo.$"
       regexp="y"
@@ -139,10 +246,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="light_capture"
-      group="capture"
       enabled="y"
       match="^INFO: Radience embraces (?<name>.+) who died valiantly in combat against (?<mob>.+).$"
       regexp="y"
@@ -150,10 +261,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="emerald_capture"
-      group="capture"
       enabled="y"
       match="^INFO: Knights race from the stronghold to avenge the death of (?<name>.+) to (?<mob>.+).$"
       regexp="y"
@@ -161,10 +276,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="touchstone_capture"
-      group="capture"
       enabled="y"
       match="^INFO: A mountain fades as (?<name>.+) dies to (?<mob>.+).$"
       regexp="y"
@@ -172,10 +291,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="boot_capture"
-      group="capture"
       enabled="y"
       match="^INFO: (?<name>.+) has failed the exam administered by (?<mob>.+).$"
       regexp="y"
@@ -183,10 +306,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="baal_capture"
-      group="capture"
       enabled="y"
       match="^INFO: (?<name>.+), cursing (?<mob>.+), embraces death and returns to the Dark One.$"
       regexp="y"
@@ -194,10 +321,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="amazon_capture"
-      group="capture"
       enabled="y"
       match="^INFO: The Tribes prepare a ritual for (?<name>.+). Hunters are sent after (?<mob>.+) for revenge.$"
       regexp="y"
@@ -205,10 +336,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="amazon_capture2"
-      group="capture"
       enabled="y"
       match="^INFO: The Amazon Warriors fight even stronger after (?<name>.+) is killed by (?<mob>.+).$"
       regexp="y"
@@ -216,10 +351,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="watchmen_capture"
-      group="capture"
       enabled="y"
       match="^INFO: (?<name>.+) has fallen, blood staining (?<mob>.+)('s|') hands.$"
       regexp="y"
@@ -227,10 +366,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="seekers_capture"
-      group="capture"
       enabled="y"
       match="^INFO: (?<name>.+)'s? knowledge couldn't save them from (?<mob>.+).$"
       regexp="y"
@@ -238,10 +381,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="lone_capture"
-      group="capture"
       enabled="y"
       match="^INFO: (?<name>.+) has been killed by (?<mob>.+).$"
       regexp="y"
@@ -249,10 +396,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="lone_capture2"
-      group="capture"
       enabled="y"
       match="^INFO: (?<name>.+) has been removed from this realm by (?<mob>.+).$"
       regexp="y"
@@ -260,10 +411,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="lone_capture3"
-      group="capture"
       enabled="y"
       match="^INFO: The valkyries come for (?<name>.+) who was slain by (?<mob>.+).$"
       regexp="y"
@@ -271,10 +426,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="twinlobe_capture"
-      group="capture"
       enabled="y"
       match="^INFO: (?<name>.+) has attained a better understanding of death, thanks to (?<mob>.+)!$"
       regexp="y"
@@ -282,10 +441,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="crimson_capture"
-      group="capture"
       enabled="y"
       match="^INFO: (?<name>.+)('s|') blood is spilled by (?<mob>.+) and the earth runs crimson.$"
       regexp="y"
@@ -293,10 +456,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="perdition_capture"
-      group="capture"
       enabled="y"
       match="^INFO: Valiant to the end, (?<name>.+) has fallen to (?<mob>.+) in battle.$"
       regexp="y"
@@ -304,10 +471,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="loqui_capture"
-      group="capture"
       enabled="y"
       match="^INFO: Silence falls as (?<name>.+) is slain by (?<mob>.+).$"
       regexp="y"
@@ -315,10 +486,14 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
    <trigger
       name="pyre_capture"
-      group="capture"
       enabled="y"
       match="^INFO: Tormented spirits wail in requiem as dark flames ravage the soul of (?<name>.+), slain by (?<mob>.+).$"
       regexp="y"
@@ -326,7 +501,12 @@
       sequence="100"
       script="death_capture"
       send_to="12"
-   />
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
 </triggers>
 
 
@@ -404,6 +584,14 @@ function help()
 end -- help --
 
 
+function set_gag_spellchants(gag)
+   SetTriggerOption("nonfiltered_spellchant_capture", "omit_from_output", gag)
+   SetTriggerOption("blank", "enabled", gag)
+   SetVariable("gag_spellchants", tostring(gag_spellchants))
+   print("ACTINFO: " .. "spellchants are " .. output)
+end -- set_gag_spellchants --
+
+
 function toggle_gag_spellchants()
    local gag = "y"
    local output = "now gagged"
@@ -412,10 +600,17 @@ function toggle_gag_spellchants()
       gag = "n"
       output = "no longer gagged"
    end
-   SetTriggerOption("nonfiltered_spellchant_capture", "omit_from_output", gag)
-   SetVariable("gag_spellchants", tostring(gag_groupcombat))
+   set_gag_spellchants(gag)
+end -- toggle_gag_spellchants --
+
+
+function set_gag_groupcombat(gag)
+   SetTriggerOption("attack_capture", "omit_from_output", gag)
+   SetTriggerOption("miss_capture", "omit_from_output", gag)
+   SetTriggerOption("immune_capture", "omit_from_output", gag)
+   SetVariable("gag_groupcombat", tostring(gag_groupcombat))
    print("ACTINFO: " .. "spellchants are " .. output)
-end -- set_gag_mode --
+end -- set_gag_groupcombat --
 
 
 function toggle_gag_groupcombat()
@@ -426,10 +621,8 @@ function toggle_gag_groupcombat()
       gag = "n"
       output = "no longer gagged"
    end
-   SetTriggerOption("attack_capture", "omit_from_output", gag)
-   SetVariable("gag_groupcombat", tostring(gag_groupcombat))
-   print("ACTINFO: " .. "spellchants are " .. output)
-end -- set_gag_mode --
+   set_gag_groupcombat(gag)
+end -- toggle_tag_groupcombat --
 
 
 function toggle_test_mode()
@@ -1227,11 +1420,20 @@ function OnPluginInstall()
    loops = {}
    current_loop = {}
    looping = false
+
    test_mode = GetVariable("test_mode") == "true"
    gag_spellchants = GetVariable("gag_spellchants") or true
    gag_spellchants = tostring(gag_spellchants) == "true"
+   local gag = "y"
+   if not gag_spellchants then gag = "n" end
+   set_gag_spellchants(gag)
+   
    gag_groupcombat = GetVariable("gag_groupcombat") or true
    gag_groupcombat = tostring(gag_groupcombat) == "true"
+   gag = "y"
+   if not gag_groupcombat then gag = "n" end
+   set_gag_groupcombat(gag)
+
    self_name = gmcp("char.base.name")
    window_install()
 end -- OnPluginInstall --
