@@ -1,4 +1,4 @@
-# Activity_Tracker 0.13
+# Activity_Tracker 0.14
 Aardwolf MUSHCLIENT plugin to track group activity
 ```
 acti help
@@ -28,7 +28,6 @@ acti test -> toggle displaying test messages (very spammy)
 ### Known issues:
 - Silent rooms
 - Self casting does not spellchant
-- Blank lines when spellchants are on and gagged
 - Group members appearing in loop data after loops are done
 - Sand attacks not tracking/outputting properly in loop data
 - Report columns are misaligned
@@ -51,6 +50,7 @@ acti test -> toggle displaying test messages (very spammy)
 - Damage tracking
 
 ### Updates:
+0.14 - Group misses/immune gagged, spellchant blank lines gagged
 0.13 - Report loop number(s), spellchant and group combat gag options, acti next/prev now scrolls through all data options, window and other variables saved, death capture\
 0.12 - Quest now also reports to mud output\
 0.11 - Fixed spellchant pretitle capture and Genie 'blizzard of sand' attack capture
