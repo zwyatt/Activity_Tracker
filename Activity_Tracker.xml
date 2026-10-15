@@ -588,7 +588,6 @@ function set_gag_spellchants(gag)
    SetTriggerOption("nonfiltered_spellchant_capture", "omit_from_output", gag)
    SetTriggerOption("blank", "enabled", gag)
    SetVariable("gag_spellchants", tostring(gag_spellchants))
-   print("ACTINFO: " .. "spellchants are " .. output)
 end -- set_gag_spellchants --
 
 
@@ -601,6 +600,7 @@ function toggle_gag_spellchants()
       output = "no longer gagged"
    end
    set_gag_spellchants(gag)
+   print("ACTINFO: " .. "spellchants are " .. output)
 end -- toggle_gag_spellchants --
 
 
@@ -609,7 +609,6 @@ function set_gag_groupcombat(gag)
    SetTriggerOption("miss_capture", "omit_from_output", gag)
    SetTriggerOption("immune_capture", "omit_from_output", gag)
    SetVariable("gag_groupcombat", tostring(gag_groupcombat))
-   print("ACTINFO: " .. "spellchants are " .. output)
 end -- set_gag_groupcombat --
 
 
@@ -622,6 +621,7 @@ function toggle_gag_groupcombat()
       output = "no longer gagged"
    end
    set_gag_groupcombat(gag)
+   print("ACTINFO: " .. "groupcombat is " .. output)
 end -- toggle_tag_groupcombat --
 
 
