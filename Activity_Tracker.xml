@@ -692,7 +692,7 @@ function Player:new(name, qs)
    player.total_deaths = 0
    player.quests = {}
    player.total_quests = 0
-   player.qt = 0
+   player.qt = os.time()
    player.qs = qs -- quest status see https://www.aardwolf.com/wiki/index.php/Clients/GMCP
 
    return player
@@ -894,11 +894,14 @@ function update_group()
          if players[name].qs ~= 1 and qs == 1 then
             players[name].qt = os.time()
          elseif players[name].qs < 2 and qs == 2 then
-            local diff = os.difftime(os.time(), players[name].qt)
+            local diff = os.difftime(os.time(), players[name].qt) .. "s"
             local timestamp = os.date("%H:%M:%S")
             players[name]:quest(timestamp, diff)
+            local finishfail = " finished quest at "
+            if member.info.qt == 15 then finishfail = " failed quest at " end
+
             if looping then current_loop[name]:quest(timestamp, diff) end
-            local notice = "ACTINFO: " .. name .. " finished quest at " .. timestamp .. " taking " .. diff .. "s"
+            local notice = "ACTINFO: " .. name .. finishfail .. timestamp .. " taking " .. diff
             CallPlugin(commlog_id, "storeFromOutside", notice)
             print(notice)
          end
@@ -1046,7 +1049,6 @@ data_options = {
 }
 
 data_options_length = 6
-
 
 function next_data()
    data_option = data_option + 1
