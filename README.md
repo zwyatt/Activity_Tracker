@@ -1,4 +1,4 @@
-# Activity_Tracker 0.15
+# Activity_Tracker 0.15h
 Aardwolf MUSHCLIENT plugin to track group activity
 ```
 acti help
@@ -52,6 +52,7 @@ acti test -> toggle displaying test messages (very spammy)
 - Damage tracking
 
 ### Updates:
+0.15h - Quest timer hotfix for table creation while player is already on quest\
 0.15 - Miniwindow update - click player for details, quest timer, death timestamps\
 0.14 - Group misses/immune gagged, spellchant blank lines gagged\
 0.13 - Report loop number(s), spellchant and group combat gag options, acti next/prev now scrolls through all data options, window and other variables saved, death capture\
