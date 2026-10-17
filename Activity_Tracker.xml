@@ -87,6 +87,7 @@
          EnableTrigger("full", true)
       </send>
    </trigger>
+
    <trigger
       name="quaff_capture"
       enabled="y"
@@ -102,6 +103,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="rescue_capture"
       enabled="y"
@@ -117,6 +119,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="self_attack_capture"
       enabled="y"   
@@ -132,6 +135,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="self_attacked_capture"
       enabled="y"   
@@ -147,6 +151,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="attack_capture"
       group="groupcombat"
@@ -163,36 +168,8 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
-   <trigger
-      name="blank"
-      group="pacman"
-      enabled="y"
-      match="^$"
-      regexp="y"
-      omit_from_output="y"
-      sequence="100"
-      send_to="12"
-   >
-      <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
-      </send>
-   </trigger>
-   <trigger
-      name="full"
-      group="pacman"
-      enabled="n"
-      match="^.*$"
-      regexp="y"
-      omit_from_output="n"
-      sequence="103"
-      send_to="12"
-   >
-      <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
-      </send>
-   </trigger>
+
+   <!-- Gag misses and immunes that don't involve the player -->
    <trigger
       name="miss_capture"
       group="groupcombat"
@@ -223,6 +200,41 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
+   <!-- Omit blank lines after gagged spellchants -->
+   <trigger
+      name="blank"
+      group="pacman"
+      enabled="y"
+      match="^$"
+      regexp="y"
+      omit_from_output="y"
+      sequence="100"
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
+
+   <trigger
+      name="full"
+      group="pacman"
+      enabled="n"
+      match="^.*$"
+      regexp="y"
+      omit_from_output="n"
+      sequence="103"
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
+
+   <!-- Clan death triggers -->
    <trigger
       name="hook_capture"
       enabled="y"
@@ -238,6 +250,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="retribution_capture"
       enabled="y"
@@ -253,6 +266,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="light_capture"
       enabled="y"
@@ -268,6 +282,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="emerald_capture"
       enabled="y"
@@ -283,6 +298,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="touchstone_capture"
       enabled="y"
@@ -298,6 +314,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="boot_capture"
       enabled="y"
@@ -313,6 +330,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="baal_capture"
       enabled="y"
@@ -328,6 +346,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="amazon_capture"
       enabled="y"
@@ -343,6 +362,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="amazon_capture2"
       enabled="y"
@@ -358,6 +378,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="watchmen_capture"
       enabled="y"
@@ -373,6 +394,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="seekers_capture"
       enabled="y"
@@ -388,6 +410,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="lone_capture"
       enabled="y"
@@ -403,6 +426,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="lone_capture2"
       enabled="y"
@@ -418,6 +442,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="lone_capture3"
       enabled="y"
@@ -433,6 +458,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="twinlobe_capture"
       enabled="y"
@@ -448,6 +474,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="crimson_capture"
       enabled="y"
@@ -463,6 +490,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="perdition_capture"
       enabled="y"
@@ -478,6 +506,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="loqui_capture"
       enabled="y"
@@ -493,6 +522,7 @@
          EnableTrigger("full", false)
       </send>
    </trigger>
+
    <trigger
       name="pyre_capture"
       enabled="y"
@@ -531,7 +561,7 @@ function is_empty(xs)
    return xs and next(xs) == nil
 end -- is_empty --
 
-
+-- [[ Copy a table as array with only the values of a dictionary ]] --
 function table.i_copy(xs)
    local ys = {}
 
@@ -545,6 +575,7 @@ function table.i_copy(xs)
 end -- table.i_copy --
 
 
+-- [[ Copy a table as an array with {key, value} pairs ]] --
 function table.i_pair_copy(xs)
    local ys = {}
 
@@ -558,6 +589,7 @@ function table.i_pair_copy(xs)
 end -- table.i_copy --
 
 
+-- [[ Replace 'you' in trigger captures with player's name ]] --
 function is_self(name)
    if string.lower(name) == "you" then
       return self_name
@@ -567,6 +599,7 @@ function is_self(name)
 end -- is_self --
 
 
+-- [[ Put pretitle in parentheses for output ]] --
 function pretitle_output(pretitle)
    local output = ""
 
@@ -862,12 +895,13 @@ end -- rescue_capture --
 
 
 function death_capture(name, line, args)
+   local timestamp = os.date("%H:%M:%S")
    if players[args.name] ~= nil then
-      players[args.name]:die(args.mob)
+      players[args.name]:die(args.mob, timestamp)
    end
 
    if is_looping(args.name) then
-      current_loop[args.name]:die(args.mob, os.date("%H:%M:%S"))
+      current_loop[args.name]:die(args.mob, timestamp)
    end
    test_print(args.name .. " died to " .. args.mob)
 end -- death_capture --
@@ -876,6 +910,7 @@ end -- death_capture --
 
 ---------------------------- Group Management ----------------------------
 
+-- [[ Update 'players' table with GMCP ]] --
 function update_group()
    local members = gmcp("group.members")
    if members ~= "" then
@@ -883,6 +918,7 @@ function update_group()
          local name = member.name
          local qs = tonumber(member.info.qs)
 
+         -- Create new player if not found
          if players[name] == nil then
             players[name] = Player:new(name, qs)
          end
@@ -891,16 +927,17 @@ function update_group()
             current_loop[name] = Player:new(name, qs)
          end
 
-         if players[name].qs ~= 1 and qs == 1 then
+         if players[name].qs ~= 1 and qs == 1 then    -- Player started a quest
             players[name].qt = os.time()
-         elseif players[name].qs < 2 and qs == 2 then
-            local diff = os.difftime(os.time(), players[name].qt) .. "s"
+         elseif players[name].qs < 2 and qs == 2 then    -- Player completed/failed a quest
+            local diff = os.difftime(os.time(), players[name].qt) .. "s"   -- Elapsed time
             local timestamp = os.date("%H:%M:%S")
             players[name]:quest(timestamp, diff)
             local finishfail = " finished quest at "
             if member.info.qt == 15 then finishfail = " failed quest at " end
 
             if looping then current_loop[name]:quest(timestamp, diff) end
+
             local notice = "ACTINFO: " .. name .. finishfail .. timestamp .. " taking " .. diff
             CallPlugin(commlog_id, "storeFromOutside", notice)
             print(notice)
@@ -1186,14 +1223,6 @@ end -- window_install --
 
 --[[ Draw the border and text ]]--
 function window_draw()
-   local hotspots = WindowHotspotList(win)
-
-   for _, hs in ipairs(hotspots) do -- Delete all but the movewindow and resize handler
-      if hs ~= "zz_mw_" .. win .. "_movewindow_hotspot" and hs ~= win.. "_resize"then
-         WindowDeleteHotspot(win, hs)
-      end
-   end
-
    local left = LEFT_MARGIN
    local top = 0
    local line = 1
@@ -1202,19 +1231,7 @@ function window_draw()
    bodyleft, bodytop, bodyright, bodybottom = Theme.DrawBorder(win)
    WindowRectOp(win, 2, bodyleft, bodytop, bodyright+1, bodybottom+1, Theme.PRIMARY_BODY) -- blank
 
-   function draw_text(text, colour)
-      top = TOP_MARGIN + (line - 1) * line_height
-      WindowText(win, font_id, text, left, top, bodyright, bodybottom, colour, false)
-      line = line + 1
-   end -- draw_text --
-
-   function player_hotspot(name)
-      local bottom = TOP_MARGIN + (line - 1) * line_height
-      -- WindowAddHotspot(Name, HotspotId, Left, Top, Right, Bottom, MouseOver, CancelMouseOver,
-      -- MouseDown, CancelMouseDown, MouseUp, TooltipText, Cursor, Flags); 
-      WindowAddHotspot(win, name, left, top, bodyright, bottom, "", "", "", "", "player_MouseUp", name, 0, 0)
-   end
-
+   -- Prepare data for miniwindow players output
    local sorted_players = table.i_copy(players)
 
    function sort_data()
@@ -1247,10 +1264,13 @@ function window_draw()
       end
    end -- sort_data --
 
+
    function pair_sort(v1, v2)
       return v1[2] > v2[2]
    end -- pair_sort --
 
+
+   -- Prepare data for miniwindow player details output
    function sort_details()
       if data_option == 0 then
          local player = details_player .. ": " .. players[details_player].total_attacks
@@ -1288,7 +1308,30 @@ function window_draw()
       end
    end
 
-   -- Title with hotspot arrows
+
+   function draw_text(text, colour)
+      top = TOP_MARGIN + (line - 1) * line_height
+      WindowText(win, font_id, text, left, top, bodyright, bodybottom, colour, false)
+      line = line + 1
+   end -- draw_text --
+
+
+   function player_hotspot(name)
+      local bottom = TOP_MARGIN + (line - 1) * line_height
+      -- WindowAddHotspot(Name, HotspotId, Left, Top, Right, Bottom, MouseOver, CancelMouseOver,
+      -- MouseDown, CancelMouseDown, MouseUp, TooltipText, Cursor, Flags); 
+      WindowAddHotspot(win, name, left, top, bodyright, bottom, "", "", "", "", "player_MouseUp", name, 0, 0)
+   end
+
+   local hotspots = WindowHotspotList(win)
+
+   for _, hs in ipairs(hotspots) do -- Delete all but the movewindow and resize handler
+      if hs ~= "zz_mw_" .. win .. "_movewindow_hotspot" and hs ~= win.. "_resize"then
+         WindowDeleteHotspot(win, hs)
+      end
+   end
+
+   -- Title with hotspot arrows ...
    draw_text("<-" .. data_options[data_option] .. "->", base_colour)
 
    if details then -- Draw player details
@@ -1408,7 +1451,6 @@ function right_click_menu()
    else
       redraw_window = false -- Nothing changed, don't redraw_window
    end
-   -- [[ End choose result ]] --
 
    if redraw_window then window_draw() end
 end -- right_click_menu --
@@ -1617,6 +1659,4 @@ end -- OnPluginClose --
 -------------------- End Plugin Handler Code ---------------------
 ]]>
 </script>
-
-
 </muclient>
