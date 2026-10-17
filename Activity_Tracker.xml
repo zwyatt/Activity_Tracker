@@ -15,7 +15,7 @@
    date_written="2026-09-30 12:00:50"
    save_state="y"
    requires="5.07"
-   version="0.14"
+   version="0.15"
 />
 
 <!--  Timers  -->
@@ -42,6 +42,7 @@
    <alias match="^acti spellchants$" regexp="y" enabled="y" sequence="100" script="toggle_gag_spellchants" />
    <alias match="^acti groupcombat$" regexp="y" enabled="y" sequence="100" script="toggle_gag_groupcombat" />
    <alias match="^acti test$" regexp="y" enabled="y" sequence="100" script="toggle_test_mode" />
+   <alias match="^acti test data$" regexp="y" enabled="y" sequence="100" script="create_test_data" />
    <alias match="^acti next$" regexp="y" enabled="y" sequence="100" script="next_data" />
    <alias match="^acti prev$" regexp="y" enabled="y" sequence="100" script="prev_data" />
    <alias match="^acti loop new$" regexp="y" enabled="y" sequence="100" script="loop_new" />
@@ -544,6 +545,19 @@ function table.i_copy(xs)
 end -- table.i_copy --
 
 
+function table.i_pair_copy(xs)
+   local ys = {}
+
+   if xs then
+      for k, v in pairs(xs) do
+         table.insert(ys, {k, v})
+      end
+   end
+
+   return ys
+end -- table.i_copy --
+
+
 function is_self(name)
    if string.lower(name) == "you" then
       return self_name
@@ -632,6 +646,22 @@ function toggle_test_mode()
 end -- set_test_mode --
 
 
+function create_test_data()
+   if players["Zargulis"] then
+      local p = players["Zargulis"]
+      p:cast("party heal")
+      p:cast("dampening field")
+      p:cast("abracadabra")
+      p:rescue("a dog")
+      p:rescue("a cat")
+      p:die("ennui", os.date("%H:%M:%S"))
+      p:die("nuclear explosion", os.date("%H:%M:%S"))
+      p:quest("sometime", 69)
+      p:quest("another time", 420)
+   end
+end
+
+
 function test_print(text)
    if test_mode then
       print(text)
@@ -654,10 +684,15 @@ function Player:new(name, qs)
    player.total_attacks = 0
    player.healing = {}
    player.total_healing = 0
-   player.quaffs = 0
-   player.rescues = 0
-   player.deaths = 0
-   player.quests = 0
+   player.quaffs = {}
+   player.total_quaffs = 0
+   player.rescues = {}
+   player.total_rescues = 0
+   player.deaths = {}
+   player.total_deaths = 0
+   player.quests = {}
+   player.total_quests = 0
+   player.qt = 0
    player.qs = qs -- quest status see https://www.aardwolf.com/wiki/index.php/Clients/GMCP
 
    return player
@@ -685,34 +720,47 @@ end -- Player:cast --
 
 
 function Player:quaff(potion)
-   self.quaffs = self.quaffs + 1
+   if self.quaffs[potion] == nil then
+      self.quaffs[potion] = 1
+   else
+      self.quaffs[potion] = self.quaffs[potion] + 1
+   end
+   self.total_quaffs = self.total_quaffs + 1
 end -- Player.quaff --
 
 
-function Player:quest()
-   self.quests = self.quests + 1
+function Player:quest(timestamp, elapsed)
+   table.insert(self.quests, {timestamp, elapsed})
+   self.total_quests = self.total_quests + 1
 end -- Player.quest --
 
 
-function Player:rescue(player)
-   self.rescues = self.rescues + 1
+function Player:rescue(rescuee)
+   if self.rescues[rescuee] == nil then
+      self.rescues[rescuee] = 1
+   else
+      self.rescues[rescuee] = self.rescues[rescuee] + 1
+   end
+   self.total_rescues = self.total_rescues + 1
 end -- Player.rescue --
 
 
-function Player:die(killer)
-   self.deaths = self.deaths + 1
+function Player:die(killer, time)
+   table.insert(self.deaths, {time, killer})
+   self.total_deaths = self.total_deaths + 1
 end -- Player.die --
 
 
 function Player:to_string()
    local output = self.name
    output = output .. " -> Atk: " .. self.total_attacks
-   output = output .. " | Heal: <N/A> "
+   local pheals = self.casts["party heal"] or 0
+   output = output .. " | Pheal: " .. pheals
    output = output .. " | Cast: " .. self.total_casts
-   output = output .. " | Resc: " .. self.rescues
-   output = output .. " | Pot: " .. self.quaffs
-   output = output .. " | D: " .. self.deaths
-   output = output .. " | Q: " .. self.quests
+   output = output .. " | Resc: " .. self.total_rescues
+   output = output .. " | Pot: " .. self.total_quaffs
+   output = output .. " | D: " .. self.total_deaths
+   output = output .. " | Q: " .. self.total_quests
    return(output)
 end
 
@@ -819,7 +867,7 @@ function death_capture(name, line, args)
    end
 
    if is_looping(args.name) then
-      current_loop[args.name]:die(args.mob)
+      current_loop[args.name]:die(args.mob, os.date("%H:%M:%S"))
    end
    test_print(args.name .. " died to " .. args.mob)
 end -- death_capture --
@@ -843,10 +891,14 @@ function update_group()
             current_loop[name] = Player:new(name, qs)
          end
 
-         if players[name].qs < 2 and qs == 2 then
-            players[name]:quest()
-            if looping then current_loop[name]:quest() end
-            local notice = "ACTINFO: " .. name .. " finished quest at " .. os.date("%I:%M:%S")
+         if players[name].qs ~= 1 and qs == 1 then
+            players[name].qt = os.time()
+         elseif players[name].qs < 2 and qs == 2 then
+            local diff = os.difftime(os.time(), players[name].qt)
+            local timestamp = os.date("%H:%M:%S")
+            players[name]:quest(timestamp, diff)
+            if looping then current_loop[name]:quest(timestamp, diff) end
+            local notice = "ACTINFO: " .. name .. " finished quest at " .. timestamp .. " taking " .. diff .. "s"
             CallPlugin(commlog_id, "storeFromOutside", notice)
             print(notice)
          end
@@ -1132,6 +1184,14 @@ end -- window_install --
 
 --[[ Draw the border and text ]]--
 function window_draw()
+   local hotspots = WindowHotspotList(win)
+
+   for _, hs in ipairs(hotspots) do -- Delete all but the movewindow and resize handler
+      if hs ~= "zz_mw_" .. win .. "_movewindow_hotspot" and hs ~= win.. "_resize"then
+         WindowDeleteHotspot(win, hs)
+      end
+   end
+
    local left = LEFT_MARGIN
    local top = 0
    local line = 1
@@ -1145,6 +1205,13 @@ function window_draw()
       WindowText(win, font_id, text, left, top, bodyright, bodybottom, colour, false)
       line = line + 1
    end -- draw_text --
+
+   function player_hotspot(name)
+      local bottom = TOP_MARGIN + (line - 1) * line_height
+      -- WindowAddHotspot(Name, HotspotId, Left, Top, Right, Bottom, MouseOver, CancelMouseOver,
+      -- MouseDown, CancelMouseDown, MouseUp, TooltipText, Cursor, Flags); 
+      WindowAddHotspot(win, name, left, top, bodyright, bottom, "", "", "", "", "player_MouseUp", name, 0, 0)
+   end
 
    local sorted_players = table.i_copy(players)
 
@@ -1164,29 +1231,79 @@ function window_draw()
          table.sort(sorted_players, function(p1, p2) return p1.total_casts > p2.total_casts end)
          return function(player) return player.total_casts end
       elseif data_option == 3 then
-         table.sort(sorted_players, function(p1, p2) return p1.rescues > p2.rescues end)
-         return function(player) return player.rescues end
+         table.sort(sorted_players, function(p1, p2) return p1.total_rescues > p2.total_rescues end)
+         return function(player) return player.total_rescues end
       elseif data_option == 4 then
-         table.sort(sorted_players, function(p1, p2) return p1.quaffs > p2.quaffs end)
-         return function(player) return player.quaffs end
+         table.sort(sorted_players, function(p1, p2) return p1.total_quaffs > p2.total_quaffs end)
+         return function(player) return player.total_quaffs end
       elseif data_option == 5 then
-         table.sort(sorted_players, function(p1, p2) return p1.deaths > p2.deaths end)
-         return function(player) return player.deaths end  
+         table.sort(sorted_players, function(p1, p2) return p1.total_deaths > p2.total_deaths end)
+         return function(player) return player.total_deaths end  
       elseif data_option == 6 then
-         table.sort(sorted_players, function(p1, p2) return p1.quests > p2.quests end)
-         return function(player) return player.quests end
+         table.sort(sorted_players, function(p1, p2) return p1.total_quests > p2.total_quests end)
+         return function(player) return player.total_quests end
       end
    end -- sort_data --
 
+   function pair_sort(v1, v2)
+      return v1[2] > v2[2]
+   end -- pair_sort --
+
+   function sort_details()
+      if data_option == 0 then
+         local player = details_player .. ": " .. players[details_player].total_attacks
+         local data = table.i_pair_copy(players[details_player].attacks)
+         table.sort(data, pair_sort)
+         return player, data
+      elseif data_option == 1 then
+         local player = details_player
+         return player, {{"Party Heal", players[details_player].casts["party heal"] or 0}}
+      elseif data_option == 2 then
+         local player = details_player .. ": " .. players[details_player].total_casts
+         local data = table.i_pair_copy(players[details_player].casts)
+         table.sort(data, pair_sort)
+         return player, data
+      elseif data_option == 3 then
+         local player = details_player .. ": " .. players[details_player].total_rescues
+         local data = table.i_pair_copy(players[details_player].rescues)
+         table.sort(data, pair_sort)
+         return player, data
+      elseif data_option == 4 then
+         local player = details_player .. ": " .. players[details_player].total_quaffs
+         local data = table.i_pair_copy(players[details_player].quaffs)
+         table.sort(data, pair_sort)
+         return player, data
+      elseif data_option == 5 then -- time, killer
+         local player = details_player .. ": " .. players[details_player].total_deaths
+         local data = table.i_copy(players[details_player].deaths)
+         table.sort(data, function(v1, v2) return v1[1] > v2[1] end)
+         return player, data
+      elseif data_option == 6 then -- timestamp, elapsed
+         local player = details_player .. ": " .. players[details_player].total_quests
+         local data = table.i_copy(players[details_player].quests)
+         table.sort(data, function(v1, v2) return v1[1] > v2[1] end)
+         return player, data
+      end
+   end
+
    -- Title with hotspot arrows
    draw_text("<-" .. data_options[data_option] .. "->", base_colour)
-   line = 2
 
-   local field = sort_data()
+   if details then -- Draw player details
+      local player, data = sort_details()
+      
+      draw_text(player, base_colour)
+      WindowAddHotspot(win, "exit_details", left, top, bodyright, bodybottom, "", "", "", "", "details_MouseUp", name, 0, 0)
 
-   -- Write player data to window
-   for _, player in ipairs(sorted_players) do
-      draw_text(player.name .. " | " .. field(player), base_colour)
+      for _, v in ipairs(data) do
+         draw_text(v[1] .. ": " .. v[2], base_colour)
+      end
+   else -- Draw players
+      local field = sort_data()
+      for _, player in ipairs(sorted_players) do
+         draw_text(player.name .. ": " .. field(player), base_colour)
+         player_hotspot(player.name)
+      end
    end
 
    Theme.AddResizeTag(win, 1, nil, nil, "MouseDown", "ResizeMoveCallback", "ResizeReleaseCallback")
@@ -1206,9 +1323,9 @@ function window_hotspots()
    WindowDragHandler(win, win .. "DragTitle", "dragmove", "dragrelease", 0)   
 
    WindowAddHotspot(win, win .. "leftArrow", width - (2 * arrowWidth + sortTypeWidth + spacing), 0, width - (arrowWidth + sortTypeWidth + spacing), lineSpacing + font_idSize, 
-      "", "", "", "", "PrevSort", "Click to change sorting mode.", 8, 0)
+      "", "", "", "", "prev_data", "Click to change sorting mode.", 8, 0)
    WindowAddHotspot(win, win .. "rightArrow", width - (arrowWidth + spacing), 0, width - (spacing / 2), font_idSize, 
-      "", "", "", "", "NextSort", "Click to change sorting mode.", 8, 0)
+      "", "", "", "", "next_data", "Click to change sorting mode.", 8, 0)
 end -- window_hotspots --
 
 
@@ -1359,7 +1476,7 @@ function MouseUp(flags, hotspot_id, win)
 end -- MouseUp --
 
 
-function LeftClickOnly(flags, hotspit_id, win)
+function LeftClickOnly(flags, hotspot_id, win)
    if bit.band(flags, miniwin.hotspot_got_rh_mouse) ~= 0 then
       return true
    end
@@ -1369,9 +1486,23 @@ end -- LeftClickOnly --
 
 function resize_window()
    WindowResize(win, width, height, Theme.PRIMARY_BODY)
-   movewindow.add_drag_handler(win, 0, 0, 0, 0)
+   movewindow.add_drag_handler(win, 0, 0, 0, line_height)
    window_draw()
 end -- resize_window --
+
+
+function player_MouseUp(flags, hotspot_id, win)
+   details = true
+   details_player = hotspot_id
+   window_draw()
+end -- player_MouseUp --
+
+
+function details_MouseUp(flags, hotspot_id, win)
+   details = false
+   details_player = nil
+   window_draw()
+end
 
 
 --[[ OnPluginSaveState ]]--
@@ -1417,6 +1548,8 @@ end -- window_enable --
 function OnPluginInstall()
    help()
    players = {}
+   details = false
+   details_player = nil
    loops = {}
    current_loop = {}
    looping = false
