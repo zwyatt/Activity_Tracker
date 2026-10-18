@@ -234,6 +234,22 @@
       </send>
    </trigger>
 
+   <trigger
+      name="join"
+      enabled="y"
+      match="^(Group) (?<player>\w*) has joined the group.$"
+      regexp="y"
+      omit_from_output="n"
+      sequence="100"
+      script="join_capture"
+      send_to="12"
+   >
+      <send>
+         EnableTrigger("blank", false)
+         EnableTrigger("full", false)
+      </send>
+   </trigger>
+
    <!-- Clan death triggers -->
    <trigger
       name="hook_capture"
@@ -930,12 +946,15 @@ function update_group()
          if players[name].qs ~= 1 and qs == 1 then    -- Player started a quest
             players[name].qt = os.time()
          elseif players[name].qs < 2 and qs == 2 then    -- Player completed/failed a quest
+            local finishfail = " finished quest at "
             local diff = os.difftime(os.time(), players[name].qt) .. "s"   -- Elapsed time
+            if tonumber(member.info.qt) < 16  then
+               finishfail = " failed quest at "
+               diff = diff .. " (F)"
+            end
             local timestamp = os.date("%H:%M:%S")
             players[name]:quest(timestamp, diff)
-            local finishfail = " finished quest at "
-            if member.info.qt == 15 then finishfail = " failed quest at " end
-
+            
             if looping then current_loop[name]:quest(timestamp, diff) end
 
             local notice = "ACTINFO: " .. name .. finishfail .. timestamp .. " taking " .. diff
@@ -955,6 +974,15 @@ function remove_member(name, line, args)
       players[args.member] = nil
    end
 end -- remove_member --
+
+
+-- [[ Do something??? with quest timing if player already in table ]] --
+function join_capture(name, line, args)
+   local player = players[args.player]
+   if player and os.difftime(os.time(), player.qt) > 60 * 15 then
+      player.qt = os.time()
+   end
+end
 
 
 function reset()
