@@ -52,6 +52,7 @@ acti test -> toggle displaying test messages (very spammy)
 - Damage tracking
 
 ### Updates:
+0.16 - Quest completion/fail detector, player leave/rejoin quest timer bandaid\
 0.15h - Quest timer hotfix for table creation while player is already on quest\
 0.15 - Miniwindow update - click player for details, quest timer, death timestamps\
 0.14 - Group misses/immune gagged, spellchant blank lines gagged\
