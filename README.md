@@ -30,13 +30,13 @@ acti test -> toggle displaying test messages (very spammy)
 
 ### Currently tracks:
 - Attacks
+- Bad aim
 - Casts
 - Rescues
 - Quaffs
 - Deaths (timestamp, killer)
 - Quests (timestamp, elapsed time)
 - Genie loops
-- Bad aim
 
 ### Known issues:
 - Silent rooms
