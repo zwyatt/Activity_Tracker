@@ -15,7 +15,7 @@
    date_written="2026-09-30 12:00:50"
    save_state="y"
    requires="5.07"
-   version="0.17"
+   version="0.17h"
 />
 
 <!--  Timers  -->
@@ -1132,7 +1132,7 @@ end -- loop_report --
 
 ------------------------- End Genie  ------------------------
 
----------------------------- BAD ----------------------------
+-------------------------- Bad Aim --------------------------
 
 function toggle_bad()
    bad_enabled = not bad_enabled
@@ -1143,19 +1143,19 @@ function toggle_bad()
       timer = "n"
    end
    SetTimerOption("bad_timer", "enabled", timer)
-   print("ACTINFO: BAD is now " .. output)
+   print("ACTINFO: Bad Aim is now " .. output)
 end
 
 
 function set_bad_target(name, line, args)
    bad_target = args.target
-   print("ACTINFO: BAD target set to -> " .. bad_target)
+   print("ACTINFO: Bad Aim target set to -> " .. bad_target)
 end
 
 
 function set_bad_timer(name, line, args)
    SetTimerOption("bad_timer", "second", args.time)
-   print("ACTINFO: BAD timer set to " .. args.time .. " seconds")
+   print("ACTINFO: Bad Aim timer set to " .. args.time .. " seconds")
 end
 
 
@@ -1170,7 +1170,7 @@ function report_bad()
 
    if #output > 0 then
       table.sort(output, function(p1, p2) return p1[2] > p2[2] end)
-      print("ACTINFO: BAD report for -> " .. bad_target)
+      print("ACTINFO: Bad Aim report for -> " .. bad_target)
       for _, player in ipairs(output) do  -- {name, temp_bad, total_bad}
          print(player[1] .. ": " .. player[2] .. " attacks / " .. player[3] .. " total")
       end
@@ -1184,7 +1184,7 @@ data_option = 0
 
 data_options = {
    [0] = "Attacks",
-   [1] = "BAD",
+   [1] = "Bad Aim",
    [2] = "Party Heals",
    [3] = "Casts",
    [4] = "Rescues",
@@ -1346,7 +1346,7 @@ function window_draw()
       if data_option == 0 then   -- Attacks
          table.sort(sorted_players, function(p1, p2) return p1.total_attacks > p2.total_attacks end)
          return function(player) return player.total_attacks end
-      elseif data_option == 1 then  -- BAD
+      elseif data_option == 1 then  -- Bad Aim
          table.sort(sorted_players, function(p1, p2) return p1.total_bad > p2.total_bad end)
          return function(player) return player.total_bad end
       elseif data_option == 2 then  -- Pheals
@@ -1392,7 +1392,7 @@ function window_draw()
 
       if data_option == 0 then   -- Attacks
          return prepare(players[details_player].total_attacks, players[details_player].attacks)
-      elseif data_option == 1 then  -- BAD
+      elseif data_option == 1 then  -- Bad Aim
          return prepare(players[details_player].total_bad, players[details_player].bad)
       elseif data_option == 2 then  -- Pheals
          return details_player, {{"Party Heal", players[details_player].casts["party heal"] or 0}}
@@ -1485,6 +1485,7 @@ function right_click_menu()
    -- [[ Generate menustring ]] --
    local menustring = ""
    menustring = "Attacks|"
+   menustring = menustring .. "Bad Aim|"
    menustring = menustring .. "Party Heals|"
    menustring = menustring .. "Casts|"
    menustring = menustring .. "Rescues|"
@@ -1512,18 +1513,20 @@ function right_click_menu()
 
    if result == "Attacks" then
       data_option = 0
-   elseif result == "Party Heals" then
+   elseif result == "Bad Aim" then
       data_option = 1
-   elseif result == "Casts" then
+   elseif result == "Party Heals" then
       data_option = 2
-   elseif result == "Rescues" then
+   elseif result == "Casts" then
       data_option = 3
-   elseif result == "Quaffs" then
+   elseif result == "Rescues" then
       data_option = 4
-   elseif result == "Deaths" then
+   elseif result == "Quaffs" then
       data_option = 5
-   elseif result == "Quests" then
+   elseif result == "Deaths" then
       data_option = 6
+   elseif result == "Quests" then
+      data_option = 7
 
    elseif result == "Font" then
       local wanted_font = utils.fontpicker(font_name, font_size) -- font dialog
