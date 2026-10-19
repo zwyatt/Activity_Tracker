@@ -15,7 +15,7 @@
    date_written="2026-09-30 12:00:50"
    save_state="y"
    requires="5.07"
-   version="0.16"
+   version="0.17"
 />
 
 <!--  Timers  -->
@@ -26,6 +26,16 @@
       enabled="y"
       script="update_group"
       hour="0" minute="0" second="1"
+      active_closed="y" >
+   </timer>
+</timers>
+
+<timers>
+   <timer
+      name="bad_timer"
+      enabled="n"
+      script="report_bad"
+      hour="0" minute="0" second="9"
       active_closed="y" >
    </timer>
 </timers>
@@ -50,6 +60,9 @@
    <alias match="^acti loop discard$" regexp="y" enabled="y" sequence="100" script="loop_discard" />
    <alias match="^acti loop reset$" regexp="y" enabled="y" sequence="100" script="loop_reset" />
    <alias match="^acti loop report$" regexp="y" enabled="y" sequence="100" script="loops_report" />
+   <alias match="^acti bad$" regexp="y" enabled="y" sequence="100" script="toggle_bad" />
+   <alias match="^acti bad (?<target>.*)$" regexp="y" enabled="y" sequence="101" script="set_bad_target" />
+   <alias match="^acti bad timer (?<time>\d*)$" regexp="y" enabled="y" sequence="100" script="set_bad_timer" />
 </aliases>
 
 
@@ -643,6 +656,10 @@ function help()
    print("acti loop reset -> ends recording and deletes all loop data")
    print("acti loop report -> reports total saved loop performance to this point")
    print("------------------------------------------------------------------------------")
+   print("acti bad -> toggle bad aim detector tracking/reporting")
+   print("acti bad <target> -> designate target to track attacks on (must be exact mobname)")
+   print("acti bad timer <seconds> -> set how often to report bad aim detector (default 9s)")
+   print("------------------------------------------------------------------------------")
    print("acti test -> toggle displaying test messages (very spammy)")
 end -- help --
 
@@ -743,6 +760,9 @@ function Player:new(name, qs)
    player.total_quests = 0
    player.qt = os.time()
    player.qs = qs -- quest status see https://www.aardwolf.com/wiki/index.php/Clients/GMCP
+   player.bad = {}
+   player.temp_bad = 0
+   player.total_bad = 0
 
    return player
 end -- Player --
@@ -755,6 +775,16 @@ function Player:attack(atk)
       self.attacks[atk.target] = self.attacks[atk.target] + 1
    end
    self.total_attacks = self.total_attacks + 1
+
+   if bad_enabled and atk.target == bad_target then
+      if self.bad[atk.target] == nil then
+         self.bad[atk.target] = 1
+      else
+         self.bad[atk.target] = self.bad[atk.target] + 1
+      end
+      self.temp_bad = self.temp_bad + 1
+      self.total_bad = self.total_bad  + 1
+   end
 end -- Player.attack --
 
 
@@ -803,6 +833,7 @@ end -- Player.die --
 function Player:to_string()
    local output = self.name
    output = output .. " -> Atk: " .. self.total_attacks
+   output = output .. " | BAD: " .. self.total_bad
    local pheals = self.casts["party heal"] or 0
    output = output .. " | Pheal: " .. pheals
    output = output .. " | Cast: " .. self.total_casts
@@ -1067,8 +1098,9 @@ function loops_report()
                local total_satks = loops_total[name].attacks["blizzard of sand"] or 0
                local loop_satks = player.attacks["blizzard of sand"] or 0
                loops_total[name].attacks["blizzard of sand"] = total_satks + loop_satks
-               loops_total[name].rescues = loops_total[name].rescues + player.rescues
-               loops_total[name].deaths = loops_total[name].deaths + player.deaths
+               loops_total[name].total_rescues = loops_total[name].total_rescues + player.rescues
+               loops_total[name].total_deaths = loops_total[name].deaths + player.total_deaths
+               loops_total[name].total_quests = loops_total[name].total_quests + player.total_quests
             else
                loops_total[name] = player
             end
@@ -1100,20 +1132,68 @@ end -- loop_report --
 
 ------------------------- End Genie  ------------------------
 
+---------------------------- BAD ----------------------------
+
+function toggle_bad()
+   bad_enabled = not bad_enabled
+   local output = "enabled"
+   local timer = "y"
+   if not bad_enabled then
+      output = "disabled"
+      timer = "n"
+   end
+   SetTimerOption("bad_timer", "enabled", timer)
+   print("ACTINFO: BAD is now " .. output)
+end
+
+
+function set_bad_target(name, line, args)
+   bad_target = args.target
+   print("ACTINFO: BAD target set to -> " .. bad_target)
+end
+
+
+function set_bad_timer(name, line, args)
+   SetTimerOption("bad_timer", "second", args.time)
+   print("ACTINFO: BAD timer set to " .. args.time .. " seconds")
+end
+
+
+function report_bad()
+   local output = {}
+   for name, player in pairs(players) do
+      if player.temp_bad > 0 then
+         table.insert(output, {name, player.temp_bad, player.total_bad})
+         player.temp_bad = 0
+      end
+   end
+
+   if #output > 0 then
+      table.sort(output, function(p1, p2) return p1[2] > p2[2] end)
+      print("ACTINFO: BAD report for -> " .. bad_target)
+      for _, player in ipairs(output) do  -- {name, temp_bad, total_bad}
+         print(player[1] .. ": " .. player[2] .. " attacks / " .. player[3] .. " total")
+      end
+   end
+end
+
+-------------------------- End BAD --------------------------
+
 ------------------------- Miniwindow ------------------------
 data_option = 0
 
 data_options = {
    [0] = "Attacks",
-   [1] = "Party Heals",
-   [2] = "Casts",
-   [3] = "Rescues",
-   [4] = "Quaffs",
-   [5] = "Deaths",
-   [6] = "Quests"
+   [1] = "BAD",
+   [2] = "Party Heals",
+   [3] = "Casts",
+   [4] = "Rescues",
+   [5] = "Quaffs",
+   [6] = "Deaths",
+   [7] = "Quests"
 }
 
-data_options_length = 6
+data_options_length = 7
 
 function next_data()
    data_option = data_option + 1
@@ -1263,10 +1343,13 @@ function window_draw()
    local sorted_players = table.i_copy(players)
 
    function sort_data()
-      if data_option == 0 then
+      if data_option == 0 then   -- Attacks
          table.sort(sorted_players, function(p1, p2) return p1.total_attacks > p2.total_attacks end)
          return function(player) return player.total_attacks end
-      elseif data_option == 1 then
+      elseif data_option == 1 then  -- BAD
+         table.sort(sorted_players, function(p1, p2) return p1.total_bad > p2.total_bad end)
+         return function(player) return player.total_bad end
+      elseif data_option == 2 then  -- Pheals
          table.sort(sorted_players,
             function(p1, p2)
                local p1_pheals = p1.casts["party heal"] or 0
@@ -1274,19 +1357,19 @@ function window_draw()
                return p1_pheals > p2_pheals
             end)
          return function(player) return player.casts["party heal"] or 0 end
-      elseif data_option == 2 then
+      elseif data_option == 3 then  -- Casts
          table.sort(sorted_players, function(p1, p2) return p1.total_casts > p2.total_casts end)
          return function(player) return player.total_casts end
-      elseif data_option == 3 then
+      elseif data_option == 4 then  -- Rescues
          table.sort(sorted_players, function(p1, p2) return p1.total_rescues > p2.total_rescues end)
          return function(player) return player.total_rescues end
-      elseif data_option == 4 then
+      elseif data_option == 5 then  -- Quaffs
          table.sort(sorted_players, function(p1, p2) return p1.total_quaffs > p2.total_quaffs end)
          return function(player) return player.total_quaffs end
-      elseif data_option == 5 then
+      elseif data_option == 6 then  -- Deaths
          table.sort(sorted_players, function(p1, p2) return p1.total_deaths > p2.total_deaths end)
          return function(player) return player.total_deaths end  
-      elseif data_option == 6 then
+      elseif data_option == 7 then -- Quests
          table.sort(sorted_players, function(p1, p2) return p1.total_quests > p2.total_quests end)
          return function(player) return player.total_quests end
       end
@@ -1300,35 +1383,31 @@ function window_draw()
 
    -- Prepare data for miniwindow player details output
    function sort_details()
-      if data_option == 0 then
-         local player = details_player .. ": " .. players[details_player].total_attacks
-         local data = table.i_pair_copy(players[details_player].attacks)
+      function prepare(total, items)
+         local player = details_player .. ": " .. total
+         local data = table.i_pair_copy(items)
          table.sort(data, pair_sort)
          return player, data
-      elseif data_option == 1 then
-         local player = details_player
-         return player, {{"Party Heal", players[details_player].casts["party heal"] or 0}}
-      elseif data_option == 2 then
-         local player = details_player .. ": " .. players[details_player].total_casts
-         local data = table.i_pair_copy(players[details_player].casts)
-         table.sort(data, pair_sort)
-         return player, data
-      elseif data_option == 3 then
-         local player = details_player .. ": " .. players[details_player].total_rescues
-         local data = table.i_pair_copy(players[details_player].rescues)
-         table.sort(data, pair_sort)
-         return player, data
-      elseif data_option == 4 then
-         local player = details_player .. ": " .. players[details_player].total_quaffs
-         local data = table.i_pair_copy(players[details_player].quaffs)
-         table.sort(data, pair_sort)
-         return player, data
-      elseif data_option == 5 then -- time, killer
+      end
+
+      if data_option == 0 then   -- Attacks
+         return prepare(players[details_player].total_attacks, players[details_player].attacks)
+      elseif data_option == 1 then  -- BAD
+         return prepare(players[details_player].total_bad, players[details_player].bad)
+      elseif data_option == 2 then  -- Pheals
+         return details_player, {{"Party Heal", players[details_player].casts["party heal"] or 0}}
+      elseif data_option == 3 then  -- Casts
+         return prepare(players[details_player].total_casts, players[details_player].casts)
+      elseif data_option == 4 then  -- Rescues
+         return prepare(players[details_player].total_rescues, players[details_player].rescues)
+      elseif data_option == 5 then  -- Quaffs
+         return prepare(players[details_player].total_quaffs, players[details_player].quaffs)
+      elseif data_option == 6 then  -- Deaths {time, killer}
          local player = details_player .. ": " .. players[details_player].total_deaths
          local data = table.i_copy(players[details_player].deaths)
          table.sort(data, function(v1, v2) return v1[1] > v2[1] end)
          return player, data
-      elseif data_option == 6 then -- timestamp, elapsed
+      elseif data_option == 7 then  -- Quests {timestamp, elapsed}
          local player = details_player .. ": " .. players[details_player].total_quests
          local data = table.i_copy(players[details_player].quests)
          table.sort(data, function(v1, v2) return v1[1] > v2[1] end)
@@ -1353,7 +1432,7 @@ function window_draw()
 
    local hotspots = WindowHotspotList(win)
 
-   for _, hs in ipairs(hotspots) do -- Delete all but the movewindow and resize handler
+   for _, hs in ipairs(hotspots) do    -- Delete all but the movewindow and resize handler
       if hs ~= "zz_mw_" .. win .. "_movewindow_hotspot" and hs ~= win.. "_resize"then
          WindowDeleteHotspot(win, hs)
       end
@@ -1362,7 +1441,7 @@ function window_draw()
    -- Title with hotspot arrows ...
    draw_text("<-" .. data_options[data_option] .. "->", base_colour)
 
-   if details then -- Draw player details
+   if details then   -- Draw player details
       local player, data = sort_details()
       
       draw_text(player, base_colour)
@@ -1371,7 +1450,7 @@ function window_draw()
       for _, v in ipairs(data) do
          draw_text(v[1] .. ": " .. v[2], base_colour)
       end
-   else -- Draw players
+   else  -- Draw players
       local field = sort_data()
       for _, player in ipairs(sorted_players) do
          draw_text(player.name .. ": " .. field(player), base_colour)
@@ -1620,11 +1699,14 @@ end -- window_enable --
 function OnPluginInstall()
    help()
    players = {}
-   details = false
-   details_player = nil
+   bad_enabled = false
+   bad_target = ""
    loops = {}
    current_loop = {}
    looping = false
+   details = false
+   details_player = nil
+
 
    test_mode = GetVariable("test_mode") == "true"
    gag_spellchants = GetVariable("gag_spellchants") or true
