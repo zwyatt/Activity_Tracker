@@ -1,5 +1,9 @@
-# Activity_Tracker 0.16
+# Activity_Tracker 0.17
 Aardwolf MUSHCLIENT plugin to track group activity
+
+### 0.17 Update: 
+- Added passive 'bad aim detector' functionality, reports silently on a timer, also viewable in miniwindow and acti report
+
 ```
 acti help
 acti report -> report tracked data
@@ -13,6 +17,10 @@ acti loop end -> ends recording and saves the current loop without starting a ne
 acti loop discard -> ends recording and discards the current loop
 acti loop reset -> ends recording and deletes all loop data
 acti loop report -> reports total saved loop performance to this point
+
+acti bad -> toggle bad aim detector tracking/reporting
+acti bad <target> -> designate target to track attacks on (must be exact mobname)
+acti bad timer <seconds> -> set how often to report bad aim detector (default 9s)
 
 acti test -> toggle displaying test messages (very spammy)
 ```
@@ -28,6 +36,7 @@ acti test -> toggle displaying test messages (very spammy)
 - Deaths (timestamp, killer)
 - Quests (timestamp, elapsed time)
 - Genie loops
+- Bad aim
 
 ### Known issues:
 - Silent rooms
