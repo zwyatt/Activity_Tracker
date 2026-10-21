@@ -39,6 +39,7 @@ acti test -> toggle displaying test messages (very spammy)
 - Genie loops
 
 ### Known issues:
+- Spellchant blank lines aren’t omitted correctly
 - Silent rooms
 - Self casting does not spellchant
 - Group members appearing in loop data after loops are done
