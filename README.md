@@ -69,3 +69,9 @@ acti test -> toggle displaying test messages (very spammy)
 0.13 - Report loop number(s), spellchant and group combat gag options, acti next/prev now scrolls through all data options, window and other variables saved, death capture\
 0.12 - Quest now also reports to mud output\
 0.11 - Fixed spellchant pretitle capture and Genie 'blizzard of sand' attack capture
+
+### Credits:
+- Loqui Data Tracker (Nokfah and Castiel), attack triggers, class structure, damage map
+- Aim Detector (Kelaire), the inspiration to track bad aim attacks
+- MUSHclient, Aardwolf MUSHclient, and various plugins (Nick Gammon and Fiendish)
+- (Sletch), brainstorming and testing
