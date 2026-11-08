@@ -15,7 +15,7 @@
    date_written="2026-09-30 12:00:50"
    save_state="y"
    requires="5.07"
-   version="0.17"
+   version="0.18"
 />
 
 <!--  Timers  -->
@@ -63,6 +63,8 @@
    <alias match="^acti bad$" regexp="y" enabled="y" sequence="100" script="toggle_bad" />
    <alias match="^acti bad (?<target>.*)$" regexp="y" enabled="y" sequence="101" script="set_bad_target" />
    <alias match="^acti bad timer (?<time>\d*)$" regexp="y" enabled="y" sequence="100" script="set_bad_timer" />
+   <alias match="acti update check" enabled="y" script="update_check" sequence="99"/>
+   <alias match="acti update install" enabled="y" script="update_install" sequence="99"/>
 </aliases>
 
 
@@ -80,8 +82,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", true)
-         EnableTrigger("full", true)
+         EnableTrigger("spellchant_blank", true)
+         EnableTrigger("spellchant_full", true)
       </send>
    </trigger>
 
@@ -96,8 +98,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", true)
-         EnableTrigger("full", true)
+         EnableTrigger("spellchant_blank", true)
+         EnableTrigger("spellchant_full", true)
       </send>
    </trigger>
 
@@ -112,8 +114,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -128,8 +130,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -144,8 +146,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -155,13 +157,13 @@
       match="^(?<crit>\*)?(?:\[(?<hits>\d+)\] )?(?<attacker>.*)'s? (?<attack>.*) (?:decimates|devastates|rends|incinerates|lacerates|obliterates|massacres|disembowels|extirpates|eradicates|dismembers|mutilates|tickles|bruises|scratches|grazes|nicks|scars|hits|injures|wounds|mauls|maims|mangles|mars|LACERATES|DECIMATES|DEVASTATES|ERADICATES|OBLITERATES|EXTIRPATES|INCINERATES|MUTILATES|DISEMBOWELS|MASSACRES|DISMEMBERS|RENDS|blasts|demolishes|shreds|destroys|pulverizes|vaporizes|atomizes|asphyxiates|ravages|fissures|liquidates|evaporates|sunders|tears into|wastes|cremates|annihilates|implodes|exterminates|shatters|slaughters|ruptures|nukes|glaciates|meteorites|supernovas|damages|- BLASTS -|-= DEMOLISHES =-|\*\* SHREDS \*\*|\*\*\*\* DESTROYS \*\*\*\*|\*\*\*\*\* PULVERIZES \*\*\*\*\*|-=- VAPORIZES -=-|\<-==-\> ATOMIZES \<-==-\>|\<-:-\> ASPHYXIATES \<-:-\>|\<-\*-\> RAVAGES \<-\*-\>|\<\>\*\<\> FISSURES \<\>\*\<\>|\<\*\>\<\*\> LIQUIDATES \<\*\>\<\*\>|\<\*\>\<\*\>\<\*\> EVAPORATES \<\*\>\<\*\>\<\*\>|\<-=-\> SUNDERS \<-=-\>|\<=-=\>\<=-=\> TEARS INTO \<=-=\>\<=-=\>|\<-\>\*\<=\> WASTES \<=\>\*\<-\>|\<-\+-\>\<-\*-\> CREMATES \<-\*-\>\<-\+-\>|\<\*\>\<\*\>\<\*\>\<\*\> ANNIHILATES \<\*\>\<\*\>\<\*\>\<\*\>|\<--\*--\>\<--\*--\> IMPLODES \<--\*--\>\<--\*--\>|\<-\>\<-=-\>\<-\> EXTERMINATES \<-\>\<-=-\>\<-\>|\<-==-\>\<-==-\> SHATTERS \<-==-\>\<-==-\>|\<\*\>\<-:-\>\<\*\> SLAUGHTERS \<\*\>\<-:-\>\<\*\>|\<-\*-\>\<-\>\<-\*-\> RUPTURES \<-\*-\>\<-\>\<-\*-\>|\<-\*-\>\<\*\>\<-\*-\> NUKES \<-\*-\>\<\*\>\<-\*-\>|-\<\[=-\+-=\]\<:::\<\>:::\> GLACIATES \<:::\<\>:::\>\[=-\+-=\]\>-|\<-=-\>\<-:-\*-:-\>\<\*--\*\> METEORITES \<\*--\*\>\<-:-\*-:-\>\<-=-\>|\<-:-\>\<-:-\*-:-\>\<-\*-\> SUPERNOVAS \<-\*-\>\<-:-\*-:-\>\<-:-\>|does UNSPEAKABLE things to|does UNTHINKABLE things to|does UNIMAGINABLE things to|does UNBELIEVABLE things to) (?<target>you). \[(?<damage>\d+)\]\*?$"
       regexp="y"
       omit_from_output="n"
-      sequence="101"
+      sequence="100"
       script="attack_capture"
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -172,13 +174,13 @@
       match="^(?<crit>\*)?(?:\[(?<hits>\d+)\] )?(?:(?<pretitle>.*) )?(?<attacker>\w*)'s? (?<attack>.*) (?:decimates|devastates|rends|incinerates|lacerates|obliterates|massacres|disembowels|extirpates|eradicates|dismembers|mutilates|tickles|bruises|scratches|grazes|nicks|scars|hits|injures|wounds|mauls|maims|mangles|mars|LACERATES|DECIMATES|DEVASTATES|ERADICATES|OBLITERATES|EXTIRPATES|INCINERATES|MUTILATES|DISEMBOWELS|MASSACRES|DISMEMBERS|RENDS|blasts|demolishes|shreds|destroys|pulverizes|vaporizes|atomizes|asphyxiates|ravages|fissures|liquidates|evaporates|sunders|tears into|wastes|cremates|annihilates|implodes|exterminates|shatters|slaughters|ruptures|nukes|glaciates|meteorites|supernovas|damages|- BLASTS -|-= DEMOLISHES =-|\*\* SHREDS \*\*|\*\*\*\* DESTROYS \*\*\*\*|\*\*\*\*\* PULVERIZES \*\*\*\*\*|-=- VAPORIZES -=-|\<-==-\> ATOMIZES \<-==-\>|\<-:-\> ASPHYXIATES \<-:-\>|\<-\*-\> RAVAGES \<-\*-\>|\<\>\*\<\> FISSURES \<\>\*\<\>|\<\*\>\<\*\> LIQUIDATES \<\*\>\<\*\>|\<\*\>\<\*\>\<\*\> EVAPORATES \<\*\>\<\*\>\<\*\>|\<-=-\> SUNDERS \<-=-\>|\<=-=\>\<=-=\> TEARS INTO \<=-=\>\<=-=\>|\<-\>\*\<=\> WASTES \<=\>\*\<-\>|\<-\+-\>\<-\*-\> CREMATES \<-\*-\>\<-\+-\>|\<\*\>\<\*\>\<\*\>\<\*\> ANNIHILATES \<\*\>\<\*\>\<\*\>\<\*\>|\<--\*--\>\<--\*--\> IMPLODES \<--\*--\>\<--\*--\>|\<-\>\<-=-\>\<-\> EXTERMINATES \<-\>\<-=-\>\<-\>|\<-==-\>\<-==-\> SHATTERS \<-==-\>\<-==-\>|\<\*\>\<-:-\>\<\*\> SLAUGHTERS \<\*\>\<-:-\>\<\*\>|\<-\*-\>\<-\>\<-\*-\> RUPTURES \<-\*-\>\<-\>\<-\*-\>|\<-\*-\>\<\*\>\<-\*-\> NUKES \<-\*-\>\<\*\>\<-\*-\>|-\<\[=-\+-=\]\<:::\<\>:::\> GLACIATES \<:::\<\>:::\>\[=-\+-=\]\>-|\<-=-\>\<-:-\*-:-\>\<\*--\*\> METEORITES \<\*--\*\>\<-:-\*-:-\>\<-=-\>|\<-:-\>\<-:-\*-:-\>\<-\*-\> SUPERNOVAS \<-\*-\>\<-:-\*-:-\>\<-:-\>|does UNSPEAKABLE things to|does UNTHINKABLE things to|does UNIMAGINABLE things to|does UNBELIEVABLE things to) (?<target>.*). \[(?<damage>\d+)\]\*?$"
       regexp="y"
       omit_from_output="y"
-      sequence="102"
+      sequence="101"
       script="attack_capture"
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -194,8 +196,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
    <trigger
@@ -209,41 +211,41 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
    <!-- Omit blank lines after gagged spellchants -->
    <trigger
-      name="blank"
-      group="pacman"
-      enabled="y"
+      name="spellchant_blank"
+      enabled="n"
       match="^$"
       regexp="y"
       omit_from_output="y"
-      sequence="100"
+      sequence="104"
+      script="pacman_blank"
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
    <trigger
-      name="full"
-      group="pacman"
+      name="spellchant_full"
       enabled="n"
       match="^.*$"
       regexp="y"
       omit_from_output="n"
-      sequence="103"
+      sequence="104"
+      script="pacman_full"
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -258,8 +260,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -275,8 +277,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -291,8 +293,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -307,8 +309,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -323,8 +325,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -339,8 +341,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -355,8 +357,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -371,8 +373,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -387,8 +389,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -403,8 +405,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -419,8 +421,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -435,8 +437,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -451,8 +453,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -467,8 +469,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -483,8 +485,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -499,8 +501,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -515,8 +517,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -531,8 +533,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -547,8 +549,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 
@@ -563,8 +565,8 @@
       send_to="12"
    >
       <send>
-         EnableTrigger("blank", false)
-         EnableTrigger("full", false)
+         EnableTrigger("spellchant_blank", false)
+         EnableTrigger("spellchant_full", false)
       </send>
    </trigger>
 </triggers>
@@ -589,6 +591,7 @@ end -- exists --
 function is_empty(xs)
    return xs and next(xs) == nil
 end -- is_empty --
+
 
 -- [[ Copy a table as array with only the values of a dictionary ]] --
 function table.i_copy(xs)
@@ -660,13 +663,15 @@ function help()
    print("acti bad <target> -> designate target to track attacks on (must be exact mobname)")
    print("acti bad timer <seconds> -> set how often to report bad aim (default 9s)")
    print("------------------------------------------------------------------------------")
+   print("acti update check -> check github for updated version")
+   print("acti update install -> download new version and reload")
    print("acti test -> toggle displaying test messages (very spammy)")
 end -- help --
 
 
 function set_gag_spellchants(gag)
    SetTriggerOption("nonfiltered_spellchant_capture", "omit_from_output", gag)
-   SetTriggerOption("blank", "enabled", gag)
+   SetTriggerOption("spellchant_blank", "omit_from_output", gag)
    SetVariable("gag_spellchants", tostring(gag_spellchants))
 end -- set_gag_spellchants --
 
@@ -682,6 +687,16 @@ function toggle_gag_spellchants()
    set_gag_spellchants(gag)
    print("ACTINFO: " .. "spellchants are " .. output)
 end -- toggle_gag_spellchants --
+
+
+function pacman_blank()
+   test_print("ACTI: pacman blank")
+end
+
+
+function pacman_full()
+   test_print("ACTI: pacman full")
+end
 
 
 function set_gag_groupcombat(gag)
@@ -914,7 +929,7 @@ end -- nonfiltered_spellchant_capture --
 
 function quaff_capture(name, line, args)
    local quaffer = is_self(args.quaffer)
-   -- test_print(quaffer .. " quaffed " .. args.potion)
+   test_print(quaffer .. " quaffed " .. args.potion)
 
    if players[quaffer] ~= nil then
       players[quaffer]:quaff(args.potion)
@@ -979,7 +994,7 @@ function update_group()
          elseif players[name].qs < 2 and qs == 2 then    -- Player completed/failed a quest
             local finishfail = " finished quest at "
             local diff = os.difftime(os.time(), players[name].qt) .. "s"   -- Elapsed time
-            if tonumber(member.info.qt) < 16  then
+            if tonumber(member.info.qt) == 15  then
                finishfail = " failed quest at "
                diff = diff .. " (F)"
             end
@@ -1017,6 +1032,8 @@ end
 
 
 function reset()
+   details = false
+   details_player = nil
    players = {}
    update_group()
    print("ACTINFO: Resetting activity tracker data")
@@ -1770,6 +1787,104 @@ function OnPluginEnable()
 end -- OnPluginClose --
 
 -------------------- End Plugin Handler Code ---------------------
+
+----------------------- Plugin Update Code -----------------------
+-- Code taken from Durel's dinv plugin, originally via Crowley
+require("wait")
+require("async")
+json = require("json")
+
+plugin_url = "https://raw.githubusercontent.com/zwyatt/Activity_Tracker/refs/heads/main/Activity_Tracker.xml"
+
+SetVariable("DownloadURL", plugin_url)
+plugin_protocol = "HTTPS"
+plugin_prefix = "[ACTI]"
+
+function update_check()
+   update_plugin("check")
+   ColourNote("white", "", plugin_prefix .. " Checking for updated version...")
+end
+
+function update_install()
+   update_plugin("install")
+   ColourNote("white", "", plugin_prefix .. " Checking for and installing updated version...")
+end
+
+function reload_plugin()
+   local scriptPrefix = GetAlphaOption("script_prefix")
+   local retval
+
+   -- If the user has not already specified the script prefix for this version of mush, pick a
+   -- reasonable default value
+   if (scriptPrefix == "") then
+      scriptPrefix = "\\\\\\"
+      SetAlphaOption("script_prefix", scriptPrefix)
+   end
+
+   -- Tell mush to reload the plugin in one second.  We can't do it directly here because a
+   -- plugin can't unload itself.  Even if it could, how could it tell mush to load it again
+   -- if it weren't installed? 
+   retval = Execute(scriptPrefix.."DoAfterSpecial(0.1, \"ReloadPlugin('"..GetPluginID().."')\", sendto.script)")
+end
+
+function update_plugin(mode)
+   update_mode = mode
+
+   wait.make(get_plugin_file)
+end
+
+function get_plugin_file()
+   local urlThread = async.request(plugin_url, plugin_protocol)
+
+   if not urlThread then
+      note_error("Couldn't create async url request.")
+      return
+   end
+
+   local timeout = 10
+   local totTime = 0
+   while (urlThread:alive() and totTime < timeout) do
+      wait.time(0.1)
+      totTime = totTime + 0.1
+   end
+
+   local remoteRet, pluginData, status, headers, fullStatus = urlThread:join()
+
+   if not status then
+      ColourNote("red", "", plugin_prefix .. " Couldn't download plugin file. No status code.")
+      return
+   end
+
+   if (status ~= 200) then
+      ColourNote("red", "", plugin_prefix .. " Plugin file request status code: " .. status .. ": " .. fullStatus)
+      return
+   end
+
+   local currentVersion = GetPluginInfo(GetPluginID(), 19) or 0
+   local currentVerStr  = string.format("%1.3f", currentVersion)
+   local remoteVerStr   = string.match(pluginData, '%s%s+version="([0-9%.]+)"')
+   local remoteVersion  = tonumber(remoteVerStr or "") or 0
+
+   if remoteVersion == currentVersion then
+      ColourNote("white", "", plugin_prefix .. " You are running the most recent version (v" .. currentVerStr .. ")")
+   elseif (remoteVersion < currentVersion) then
+      ColourNote("white", "", plugin_prefix .. " You have a newer version than is publicly available. (v" .. currentVerStr .. ")")
+   elseif (update_mode == "check") then
+      ColourNote("white", "", plugin_prefix .. " You are running v" .. currentVerStr .. ", but there's a newer version v" .. remoteVerStr)
+   elseif (update_mode == "install") then
+      ColourNote("white", "", plugin_prefix .. " Updating plugin from version " .. currentVerStr .. " to version " .. remoteVerStr) 
+
+      local pluginFile = GetPluginInfo(GetPluginID(), 6)
+      local file = io.open(pluginFile, "wb")
+      file:write(pluginData)
+      file:close()
+
+      reload_plugin()
+   else
+      ColourNote("red", "", plugin_prefix .. " Invalid update mode: " .. update_mode)
+   end
+end
+ ----------------------- End Plugin Update Code -----------------------
 ]]>
 </script>
 </muclient>
