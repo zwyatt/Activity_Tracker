@@ -1,8 +1,11 @@
-# Activity_Tracker 0.17h
+# Activity_Tracker 0.18
 Aardwolf MUSHCLIENT plugin to track group activity
 
-### 0.17 Update: 
-- Added passive 'bad aim' functionality, reports silently on a timer, also viewable in miniwindow and acti report
+### 0.18 Update: 
+- Added plugin updating functionality
+- Ice Age quests now not considered fails
+- 'acti reset' goes back to player list view to avoid nil index when the details member is no longer in group
+- Blanks between gagged spellchants now omit correctly
 
 ```
 acti help
@@ -30,7 +33,8 @@ acti test -> toggle displaying test messages (very spammy)
 
 ### Currently tracks:
 - Attacks
-- Bad aim
+- Passive 'bad aim' functionality, reports silently on a timer, also viewable in miniwindow and acti report
+- Party Heals
 - Casts
 - Rescues
 - Quaffs
@@ -39,19 +43,15 @@ acti test -> toggle displaying test messages (very spammy)
 - Genie loops
 
 ### Known issues:
-- Spellchant blank lines aren’t omitted correctly
 - Silent rooms
 - Self casting does not spellchant
 - Group members appearing in loop data after loops are done
 - Report columns are misaligned
-- Pills not tracked
 
 ### Todo:
 - Report and miniwindow formatting
-- Party heal and dampen+dispel columns
 - Filter out damage spells and spellups from spellchant cast data
 - Separate attacks and spells/skills
-- Player details
 - Reciting capture
 - Healing capture
 - Damage taken capture
@@ -62,6 +62,7 @@ acti test -> toggle displaying test messages (very spammy)
 - Damage tracking
 
 ### Updates:
+0.17 - Added passive 'bad aim' functionality, reports silently on a timer, also viewable in miniwindow and acti report
 0.16 - Quest completion/fail detector, player leave/rejoin quest timer bandaid\
 0.15h - Quest timer hotfix for table creation while player is already on quest\
 0.15 - Miniwindow update - click player for details, quest timer, death timestamps\
@@ -72,6 +73,7 @@ acti test -> toggle displaying test messages (very spammy)
 
 ### Credits:
 - Loqui Data Tracker (Nokfah and Castiel), attack triggers, class structure, damage map
+- (Crowley), plugin updating
 - Aim Detector (Kelaire), the inspiration to track bad aim attacks
 - MUSHclient, Aardwolf MUSHclient, and various plugins (Nick Gammon and Fiendish)
 - (Sletch), brainstorming and testing
